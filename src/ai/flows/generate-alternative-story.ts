@@ -18,6 +18,7 @@ const GenerateAlternativeStoryInputSchema = z.object({
   question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
   question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
   yearsTogether: z.number().describe('The number of years the couple has been together.'),
+  genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
 });
 export type GenerateAlternativeStoryInput = z.infer<typeof GenerateAlternativeStoryInputSchema>;
 
@@ -40,6 +41,7 @@ const prompt = ai.definePrompt({
       question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
       question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
       yearsTogether: z.number().describe('The number of years the couple has been together.'),
+      genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
     }),
   },
   output: {
@@ -49,7 +51,7 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are a creative writer specializing in humorous and fictional stories.
 
-  Based on the provided answers to the multiple-choice questions and the number of years the couple has been together, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected.  Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian.
+  Based on the provided answers to the multiple-choice questions, the number of years the couple has been together, and the selected genre, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected. Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian. The story should be in the "{{{genre}}}" genre.
 
   Question 1 Answer: {{{question1Answer}}}
   Question 2 Answer: {{{question2Answer}}}

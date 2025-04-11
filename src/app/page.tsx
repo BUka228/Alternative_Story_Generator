@@ -7,6 +7,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 
 const questions = [
   {
@@ -32,9 +33,10 @@ export default function Home() {
   const [question1Answer, setQuestion1Answer] = useState('');
   const [question2Answer, setQuestion2Answer] = useState('');
   const [question3Answer, setQuestion3Answer] = useState('');
-  const [yearsTogether, setYearsTogether] = useState<number>(0);
+  const [yearsTogether, setYearsTogether] = useState<number>(1);
   const [alternativeStory, setAlternativeStory] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [genre, setGenre] = useState('Смешная');
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -46,6 +48,7 @@ export default function Home() {
         question2Answer,
         question3Answer,
         yearsTogether,
+        genre,
       });
       setAlternativeStory(result.alternativeStory);
     } catch (error) {
@@ -124,13 +127,31 @@ export default function Home() {
             <Input
               id="yearsTogether"
               type="number"
-              min="0"
+              min="1"
               placeholder="Количество лет"
               value={yearsTogether.toString()}
               onChange={(e) => setYearsTogether(Number(e.target.value))}
               className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="genre" className="text-sm font-medium">
+              Выберите тон истории
+            </Label>
+            <Select value={genre} onValueChange={setGenre}>
+              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                <SelectValue placeholder="Выберите тон истории" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Смешная">Смешная</SelectItem>
+                <SelectItem value="Фантастическая">Фантастическая</SelectItem>
+                <SelectItem value="Романтическая (с иронией)">Романтическая (с иронией)</SelectItem>
+                <SelectItem value="Как в кино">Как в кино</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
