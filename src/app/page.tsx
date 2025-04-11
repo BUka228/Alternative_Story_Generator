@@ -94,6 +94,7 @@ export default function Home() {
             <Input
               id="yearsTogether"
               type="number"
+              min="1"
               placeholder="Количество лет"
               value={yearsTogether.toString()}
               onChange={(e) => setYearsTogether(Number(e.target.value))}
