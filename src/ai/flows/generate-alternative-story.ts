@@ -17,6 +17,8 @@ const GenerateAlternativeStoryInputSchema = z.object({
   question1Answer: z.string().describe('Answer to the first multiple-choice question.'),
   question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
   question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
+  question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
+  question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
   yearsTogether: z.number().describe('The number of years the couple has been together.'),
   genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
 });
@@ -40,6 +42,8 @@ const prompt = ai.definePrompt({
       question1Answer: z.string().describe('Answer to the first multiple-choice question.'),
       question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
       question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
+      question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
+      question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
       yearsTogether: z.number().describe('The number of years the couple has been together.'),
       genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
     }),
@@ -56,6 +60,8 @@ const prompt = ai.definePrompt({
   Question 1 Answer: {{{question1Answer}}}
   Question 2 Answer: {{{question2Answer}}}
   Question 3 Answer: {{{question3Answer}}}
+  Question 4 Answer: {{{question4Answer}}}
+  Question 5 Answer: {{{question5Answer}}}
 
   Alternative Story:`, 
 });
@@ -71,3 +77,4 @@ const generateAlternativeStoryFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+

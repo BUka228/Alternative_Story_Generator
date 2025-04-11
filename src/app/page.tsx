@@ -25,12 +25,24 @@ const questions = [
     text: 'Какое супер-умение НЕ пригодилось вам в первый год?',
     options: ['Левитация', 'Телепатия', 'Супер-скорость'],
   },
+   {
+    id: 'question4',
+    text: 'Что вы точно НЕ делали вместе на первом свидании?',
+    options: ['Кормили голубей', 'Танцевали танго', 'Разговаривали о философии'],
+  },
+  {
+    id: 'question5',
+    text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?',
+    options: ['Дракон', 'Единорог', 'Крокодил'],
+  },
 ];
 
 const crazyAnswers = {
   question1: ['На Марсе', 'В холодильнике', 'На лекции по квантовой физике'],
   question2: ['Рыба-меч', 'Фиолетовый бегемот', 'Синхрофазотрон'],
   question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
+  question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
+  question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
 };
 
 export default function Home() {
@@ -39,6 +51,8 @@ export default function Home() {
   const [question1Answer, setQuestion1Answer] = useState('');
   const [question2Answer, setQuestion2Answer] = useState('');
   const [question3Answer, setQuestion3Answer] = useState('');
+  const [question4Answer, setQuestion4Answer] = useState('');
+  const [question5Answer, setQuestion5Answer] = useState('');
   const [yearsTogether, setYearsTogether] = useState<number>(1);
   const [alternativeStory, setAlternativeStory] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +67,8 @@ export default function Home() {
         question1Answer,
         question2Answer,
         question3Answer,
+        question4Answer,
+        question5Answer,
         yearsTogether,
         genre,
       });
@@ -69,6 +85,8 @@ export default function Home() {
     setQuestion1Answer(crazyAnswers.question1[Math.floor(Math.random() * crazyAnswers.question1.length)]);
     setQuestion2Answer(crazyAnswers.question2[Math.floor(Math.random() * crazyAnswers.question2.length)]);
     setQuestion3Answer(crazyAnswers.question3[Math.floor(Math.random() * crazyAnswers.question3.length)]);
+     setQuestion4Answer(crazyAnswers.question4[Math.floor(Math.random() * crazyAnswers.question4.length)]);
+    setQuestion5Answer(crazyAnswers.question5[Math.floor(Math.random() * crazyAnswers.question5.length)]);
   };
 
   return (
@@ -116,16 +134,20 @@ export default function Home() {
               <Input
                 id={question.id}
                 type="text"
-                placeholder={question.id === 'question1' ? 'На Марсе, В холодильнике, На лекции по квантовой физике' : question.id === 'question2' ? 'Рыба-меч, Фиолетовый бегемот, Синхрофазотрон' : 'Левитация тостеров, Чтение мыслей камней, Мгновенная телепортация носков'}
-                value={question.id === 'question1' ? question1Answer : question.id === 'question2' ? question2Answer : question3Answer}
+                placeholder={question.id === 'question1' ? 'На Марсе, В холодильнике, На лекции по квантовой физике' : question.id === 'question2' ? 'Рыба-меч, Фиолетовый бегемот, Синхрофазотрон' : question.id === 'question3' ? 'Левитация тостеров, Чтение мыслей камней, Мгновенная телепортация носков' : question.id === 'question4' ? 'Прыгали с парашютом, Играли в шахматы под водой, Участвовали в гонках на тракторах' : 'Динозавр, Феникс, Гигантский муравей'}
+                value={question.id === 'question1' ? question1Answer : question.id === 'question2' ? question2Answer : question.id === 'question3' ? question3Answer : question.id === 'question4' ? question4Answer : question5Answer}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (question.id === 'question1') {
                     setQuestion1Answer(value);
                   } else if (question.id === 'question2') {
                     setQuestion2Answer(value);
-                  } else {
+                  } else if (question.id === 'question3') {
                     setQuestion3Answer(value);
+                  }  else if (question.id === 'question4') {
+                    setQuestion4Answer(value);
+                  } else {
+                    setQuestion5Answer(value);
                   }
                 }}
                 className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
@@ -195,3 +217,4 @@ export default function Home() {
     </div>
   );
 }
+
