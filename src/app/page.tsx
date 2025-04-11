@@ -27,6 +27,8 @@ const questions = [
 ];
 
 export default function Home() {
+  const [partner1Name, setPartner1Name] = useState('');
+  const [partner2Name, setPartner2Name] = useState('');
   const [question1Answer, setQuestion1Answer] = useState('');
   const [question2Answer, setQuestion2Answer] = useState('');
   const [question3Answer, setQuestion3Answer] = useState('');
@@ -38,6 +40,8 @@ export default function Home() {
     setIsLoading(true);
     try {
       const result = await generateAlternativeStory({
+        partner1Name,
+        partner2Name,
         question1Answer,
         question2Answer,
         question3Answer,
@@ -63,6 +67,32 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Separator />
+          <div className="space-y-2">
+            <Label htmlFor="partner1Name" className="text-sm font-medium">
+              Имя первого партнера
+            </Label>
+            <Input
+              id="partner1Name"
+              type="text"
+              placeholder="Имя"
+              value={partner1Name}
+              onChange={(e) => setPartner1Name(e.target.value)}
+              className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="partner2Name" className="text-sm font-medium">
+              Имя второго партнера
+            </Label>
+            <Input
+              id="partner2Name"
+              type="text"
+              placeholder="Имя"
+              value={partner2Name}
+              onChange={(e) => setPartner2Name(e.target.value)}
+              className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            />
+          </div>
           {questions.map((question) => (
             <div key={question.id} className="space-y-2">
               <Label htmlFor={question.id} className="text-sm font-medium">
@@ -123,4 +153,3 @@ export default function Home() {
     </div>
   );
 }
-

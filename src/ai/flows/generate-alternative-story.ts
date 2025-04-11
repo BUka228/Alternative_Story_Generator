@@ -1,4 +1,3 @@
-// src/ai/flows/generate-alternative-story.ts
 'use server';
 
 /**
@@ -13,6 +12,8 @@ import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const GenerateAlternativeStoryInputSchema = z.object({
+  partner1Name: z.string().describe('The name of the first partner.'),
+  partner2Name: z.string().describe('The name of the second partner.'),
   question1Answer: z.string().describe('Answer to the first multiple-choice question.'),
   question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
   question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
@@ -33,6 +34,8 @@ const prompt = ai.definePrompt({
   name: 'generateAlternativeStoryPrompt',
   input: {
     schema: z.object({
+      partner1Name: z.string().describe('The name of the first partner.'),
+      partner2Name: z.string().describe('The name of the second partner.'),
       question1Answer: z.string().describe('Answer to the first multiple-choice question.'),
       question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
       question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
@@ -46,7 +49,7 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are a creative writer specializing in humorous and fictional stories.
 
-  Based on the provided answers to the multiple-choice questions and the number of years the couple has been together, generate a short, funny, and completely made-up "alternative story" of how they met. Be creative and unexpected.  Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian.
+  Based on the provided answers to the multiple-choice questions and the number of years the couple has been together, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected.  Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian.
 
   Question 1 Answer: {{{question1Answer}}}
   Question 2 Answer: {{{question2Answer}}}
@@ -66,4 +69,3 @@ const generateAlternativeStoryFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
-
