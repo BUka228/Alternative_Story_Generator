@@ -89,6 +89,15 @@ export default function Home() {
     setQuestion5Answer(crazyAnswers.question5[Math.floor(Math.random() * crazyAnswers.question5.length)]);
   };
 
+  const copyToClipboard = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(alternativeStory);
+      alert('Текст скопирован!');
+    } else {
+      alert('Ваш браузер не поддерживает копирование в буфер обмена.');
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
       <Card className="w-full max-w-md space-y-4 p-4 rounded-lg shadow-md">
@@ -210,6 +219,9 @@ export default function Home() {
               <div className="p-3 rounded-md bg-gray-100 text-gray-800">
                 {alternativeStory}
               </div>
+              <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                Скопировать текст
+              </Button>
             </div>
           )}
         </CardContent>
