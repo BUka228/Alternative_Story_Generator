@@ -27,6 +27,12 @@ const questions = [
   },
 ];
 
+const crazyAnswers = {
+  question1: ['На Марсе', 'В холодильнике', 'На лекции по квантовой физике'],
+  question2: ['Рыба-меч', 'Фиолетовый бегемот', 'Синхрофазотрон'],
+  question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
+};
+
 export default function Home() {
   const [partner1Name, setPartner1Name] = useState('');
   const [partner2Name, setPartner2Name] = useState('');
@@ -57,6 +63,12 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const generateRandomAnswers = () => {
+    setQuestion1Answer(crazyAnswers.question1[Math.floor(Math.random() * crazyAnswers.question1.length)]);
+    setQuestion2Answer(crazyAnswers.question2[Math.floor(Math.random() * crazyAnswers.question2.length)]);
+    setQuestion3Answer(crazyAnswers.question3[Math.floor(Math.random() * crazyAnswers.question3.length)]);
   };
 
   return (
@@ -159,6 +171,15 @@ export default function Home() {
           >
             {isLoading ? 'Генерация истории...' : 'Создать историю'}
           </Button>
+
+          <Button
+            type="button"
+            onClick={generateRandomAnswers}
+            className="mt-2 w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+          >
+            Удиви меня!
+          </Button>
+
           {alternativeStory && (
             <div className="space-y-2 mt-4">
               <Label htmlFor="alternativeStory" className="text-sm font-medium">
