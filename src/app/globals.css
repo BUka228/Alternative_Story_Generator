@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,13 +9,13 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 53% 97%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --primary: 257 79% 56%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -41,7 +42,11 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --f0f8ff: 222 63% 98%;
+    --a020f0: 267 86% 34%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -85,4 +90,22 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom CSS variables for colors */
+.bg-f0f8ff {
+  background-color: hsl(var(--f0f8ff));
+}
+
+.text-a020f0 {
+  color: hsl(var(--a020f0));
+}
+
+.bg-a020f0 {
+  background-color: hsl(var(--a020f0));
+}
+
+/* Apply a clean and readable sans-serif font */
+body {
+  font-family: sans-serif;
 }
