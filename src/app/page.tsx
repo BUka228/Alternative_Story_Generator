@@ -71,7 +71,7 @@ export default function Home() {
               <Input
                 id={question.id}
                 type="text"
-                placeholder={`Ваш ответ на "${question.text}"`}
+                placeholder={question.id === 'question1' ? 'На Марсе, В холодильнике, На лекции по квантовой физике' : question.id === 'question2' ? 'Рыба-меч, Фиолетовый бегемот, Синхрофазотрон' : 'Левитация тостеров, Чтение мыслей камней, Мгновенная телепортация носков'}
                 value={question.id === 'question1' ? question1Answer : question.id === 'question2' ? question2Answer : question3Answer}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -122,3 +122,4 @@ export default function Home() {
     </div>
   );
 }
+
