@@ -146,7 +146,7 @@ export default function Home() {
               <Input
                 id={question.id}
                 type="text"
-                placeholder={question.id === 'question1' ? 'На Марсе, В холодильнике, На лекции по квантовой физике' : question.id === 'question2' ? 'Рыба-меч, Фиолетовый бегемот, Синхрофазотрон' : question.id === 'question3' ? 'Левитация тостеров, Чтение мыслей камней, Мгновенная телепортация носков' : question.id === 'question4' ? 'Прыгали с парашютом, Играли в шахматы под водой, Участвовали в гонках на тракторах' : 'Динозавр, Феникс, Гигантский муравей'}
+                placeholder={question.id === 'question1' ? 'На вершине Эвереста во время чаепития' : question.id === 'question2' ? 'Фиолетовый нарвал шепчет' : question.id === 'question3' ? 'Левитация тостеров' : question.id === 'question4' ? 'Прыгали с парашютом' : 'Динозавр'}
                 value={question.id === 'question1' ? question1Answer : question.id === 'question2' ? question2Answer : question.id === 'question3' ? question3Answer : question.id === 'question4' ? question4Answer : question5Answer}
                 onChange={(e) => {
                   const value = e.target.value;
