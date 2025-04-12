@@ -315,11 +315,7 @@ export default function Home() {
               <Label htmlFor="alternativeStory" className="text-sm font-medium text-a020f0">
                 Альтернативная история:
               </Label>
-               <Card className="w-full rounded-xl shadow-lg">
-                  <CardContent className="space-y-4">
-                    <p className="story-text">{alternativeStory}</p>
-                  </CardContent>
-                </Card>
+              <p className="story-text">{alternativeStory}</p>
               <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                 <Copy className="mr-2 h-4 w-4" />
                 Скопировать текст
@@ -331,4 +327,5 @@ export default function Home() {
     </div>
   );
 }
+
 
