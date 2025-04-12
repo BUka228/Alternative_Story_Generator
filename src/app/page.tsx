@@ -8,7 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Copy, User, Star, Share2} from 'lucide-react';
+import {Copy, User, Star, Share2, Heart} from 'lucide-react';
 import {useToast} from "@/hooks/use-toast";
 import {
   DropdownMenu,
@@ -381,6 +381,12 @@ export default function Home() {
                 <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                   <Copy className="mr-2 h-4 w-4" />
                   Скопировать текст
+                </Button>
+                <Button asChild variant="outline">
+                  <a href="https://boosty.to/altigerg" target="_blank" rel="noopener noreferrer">
+                    <Heart className="mr-2 h-4 w-4"/>
+                    Поддержать проект
+                  </a>
                 </Button>
               </div>
             </div>
