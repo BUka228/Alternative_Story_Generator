@@ -22,7 +22,7 @@ const GenerateAlternativeStoryInputSchema = z.object({
   keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
   keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
   yearsTogether: z.number().describe('The number of years the couple has been together.'),
-  genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
+  genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино, Научная фантастика, Сказка, Детектив, Хоррор (юмористический)).'),
 });
 export type GenerateAlternativeStoryInput = z.infer<typeof GenerateAlternativeStoryInputSchema>;
 
@@ -49,7 +49,7 @@ const prompt = ai.definePrompt({
       keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
       keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
       yearsTogether: z.number().describe('The number of years the couple has been together.'),
-      genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
+      genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино, Научная фантастика, Сказка, Детектив, Хоррор (юмористический)).'),
     }),
   },
   output: {
@@ -87,3 +87,4 @@ const generateAlternativeStoryFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+

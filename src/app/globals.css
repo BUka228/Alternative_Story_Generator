@@ -114,3 +114,11 @@ body {
 .title {
   font-family: var(--font-geist-mono);
 }
+
+.story-text {
+  font-family: var(--font-geist-sans);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: hsl(var(--foreground));
+}

@@ -316,7 +316,7 @@ export default function Home() {
                 Альтернативная история:
               </Label>
               <div className="p-3 rounded-md bg-gray-100 text-gray-800">
-                {alternativeStory}
+                <p className="story-text">{alternativeStory}</p>
               </div>
               <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                 <Copy className="mr-2 h-4 w-4" />
