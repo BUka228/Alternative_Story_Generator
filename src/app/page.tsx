@@ -340,37 +340,53 @@ export default function Home() {
                 <SelectValue placeholder="Выберите тон истории" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Смешная" className="flex items-center">
-                  <Dumbbell className="mr-2 h-4 w-4"/>
-                  Смешная
+                <SelectItem value="Смешная">
+                  <div className="flex items-center">
+                    <Dumbbell className="mr-2 h-4 w-4"/>
+                    Смешная
+                  </div>
                 </SelectItem>
-                <SelectItem value="Фантастическая" className="flex items-center">
-                  <Tent className="mr-2 h-4 w-4"/>
-                  Фантастическая
+                <SelectItem value="Фантастическая">
+                   <div className="flex items-center">
+                    <Tent className="mr-2 h-4 w-4"/>
+                    Фантастическая
+                  </div>
                 </SelectItem>
-                <SelectItem value="Романтическая (с иронией)" className="flex items-center">
-                  <Heart className="mr-2 h-4 w-4"/>
-                  Романтическая (с иронией)
+                <SelectItem value="Романтическая (с иронией)">
+                   <div className="flex items-center">
+                    <Heart className="mr-2 h-4 w-4"/>
+                    Романтическая (с иронией)
+                  </div>
                 </SelectItem>
-                <SelectItem value="Как в кино" className="flex items-center">
-                  <Clapperboard className="mr-2 h-4 w-4"/>
-                  Как в кино
+                <SelectItem value="Как в кино">
+                   <div className="flex items-center">
+                    <Clapperboard className="mr-2 h-4 w-4"/>
+                    Как в кино
+                  </div>
                 </SelectItem>
-                 <SelectItem value="Научная фантастика" className="flex items-center">
-                  <Microscope className="mr-2 h-4 w-4"/>
-                  Научная фантастика
+                 <SelectItem value="Научная фантастика">
+                    <div className="flex items-center">
+                      <Microscope className="mr-2 h-4 w-4"/>
+                      Научная фантастика
+                    </div>
                 </SelectItem>
-                <SelectItem value="Сказка" className="flex items-center">
-                  <BookOpen className="mr-2 h-4 w-4"/>
-                  Сказка
+                <SelectItem value="Сказка">
+                   <div className="flex items-center">
+                    <BookOpen className="mr-2 h-4 w-4"/>
+                    Сказка
+                  </div>
                 </SelectItem>
-                <SelectItem value="Детектив" className="flex items-center">
-                  <User className="mr-2 h-4 w-4"/>
-                  Детектив
+                <SelectItem value="Детектив">
+                   <div className="flex items-center">
+                    <User className="mr-2 h-4 w-4"/>
+                    Детектив
+                  </div>
                 </SelectItem>
-                <SelectItem value="Хоррор (юмористический)" className="flex items-center">
-                  <Ghost className="mr-2 h-4 w-4"/>
-                  Хоррор (юмористический)
+                <SelectItem value="Хоррор (юмористический)">
+                   <div className="flex items-center">
+                    <Ghost className="mr-2 h-4 w-4"/>
+                    Хоррор (юмористический)
+                  </div>
                 </SelectItem>
               </SelectContent>
             </Select>
