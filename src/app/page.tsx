@@ -8,7 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Copy, User, Star} from 'lucide-react';
+import {Copy, User, Star, Share2} from 'lucide-react';
 
 const questions = [
   {
@@ -90,14 +90,22 @@ export default function Home() {
     setQuestion5Answer(answers[4][Math.floor(Math.random() * answers[4].length)]);
   };
 
-  const copyToClipboard = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(alternativeStory);
-      alert('Текст скопирован!');
+  const shareStory = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'История Наоборот',
+          text: alternativeStory,
+        });
+        console.log('Shared successfully');
+      } catch (error) {
+        console.error('Sharing failed:', error);
+      }
     } else {
-      alert('Ваш браузер не поддерживает копирование в буфер обмена.');
+      alert('Ваш браузер не поддерживает функцию "Поделиться".');
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
@@ -316,10 +324,10 @@ export default function Home() {
                 Альтернативная история:
               </Label>
               <p className="story-text">{alternativeStory}</p>
-              <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
-                <Copy className="mr-2 h-4 w-4" />
-                Скопировать текст
-              </Button>
+                <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Поделиться
+                </Button>
             </div>
           )}
         </CardContent>
@@ -327,5 +335,3 @@ export default function Home() {
     </div>
   );
 }
-
-
