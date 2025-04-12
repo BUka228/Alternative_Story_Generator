@@ -43,8 +43,8 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --f0f8ff: 222 63% 98%;
-    --a020f0: 267 86% 34%;
+    --f0f8ff: 225 100% 97%;
+    --a020f0: 267 83% 34%;
   }
 
   .dark {
@@ -107,5 +107,10 @@ body {
 
 /* Apply a clean and readable sans-serif font */
 body {
-  font-family: sans-serif;
+  font-family: var(--font-geist-sans);
+}
+
+/* Apply a clean and readable sans-serif font for titles */
+.title {
+  font-family: var(--font-geist-mono);
 }

@@ -100,9 +100,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
-      <Card className="w-full max-w-md space-y-4 p-4 rounded-lg shadow-md">
+      <Card className="w-full max-w-md space-y-4 p-4 rounded-xl shadow-lg">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-center">История Наоборот</CardTitle>
+          <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
           <CardDescription className="text-sm text-muted-foreground text-center">
             Ответьте на вопросы, чтобы создать забавную альтернативную историю вашей встречи.
           </CardDescription>
@@ -119,7 +119,7 @@ export default function Home() {
               placeholder="Имя"
               value={partner1Name}
               onChange={(e) => setPartner1Name(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
             />
           </div>
           <div className="space-y-2">
@@ -132,7 +132,7 @@ export default function Home() {
               placeholder="Имя"
               value={partner2Name}
               onChange={(e) => setPartner2Name(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
             />
           </div>
           {questions.map((question) => (
@@ -159,7 +159,7 @@ export default function Home() {
                     setQuestion5Answer(value);
                   }
                 }}
-                className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
               />
             </div>
           ))}
@@ -170,11 +170,11 @@ export default function Home() {
             <Input
               id="yearsTogether"
               type="number"
-              min="1"
+              min="0"
               placeholder="Количество лет"
               value={yearsTogether.toString()}
               onChange={(e) => setYearsTogether(Number(e.target.value))}
-              className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
             />
           </div>
 
@@ -183,7 +183,7 @@ export default function Home() {
               Выберите тон истории
             </Label>
             <Select value={genre} onValueChange={setGenre}>
-              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0">
                 <SelectValue placeholder="Выберите тон истории" />
               </SelectTrigger>
               <SelectContent>
@@ -213,7 +213,7 @@ export default function Home() {
 
           {alternativeStory && (
             <div className="space-y-2 mt-4">
-              <Label htmlFor="alternativeStory" className="text-sm font-medium">
+              <Label htmlFor="alternativeStory" className="text-sm font-medium text-a020f0">
                 Альтернативная история:
               </Label>
               <div className="p-3 rounded-md bg-gray-100 text-gray-800">
@@ -229,4 +229,3 @@ export default function Home() {
     </div>
   );
 }
-
