@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { BookOpen, Clapperboard, Dumbbell, Gem, Ghost, Microscope, Tent, Tv } from 'lucide-react';
 
 const questions = [
   {
@@ -46,6 +47,17 @@ const crazyAnswers = {
   question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
   question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
   question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
+};
+
+const genreIcons = {
+    "Смешная": Dumbbell,
+    "Фантастическая": Tent,
+    "Романтическая (с иронией)": Heart,
+    "Как в кино": Clapperboard,
+    "Научная фантастика": Microscope,
+    "Сказка": BookOpen,
+    "Детектив": User,
+    "Хоррор (юмористический)": Ghost,
 };
 
 export default function Home() {
@@ -140,7 +152,12 @@ export default function Home() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff" style={{
+        backgroundImage: 'url("/bg.jpg")',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center'
+      }}>
       <Card className="w-full max-w-5xl space-y-4 p-4 rounded-xl shadow-lg">
         <CardHeader>
           <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
@@ -313,14 +330,38 @@ export default function Home() {
                 <SelectValue placeholder="Выберите тон истории" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Смешная">Смешная</SelectItem>
-                <SelectItem value="Фантастическая">Фантастическая</SelectItem>
-                <SelectItem value="Романтическая (с иронией)">Романтическая (с иронией)</SelectItem>
-                <SelectItem value="Как в кино">Как в кино</SelectItem>
-                 <SelectItem value="Научная фантастика">Научная фантастика</SelectItem>
-                <SelectItem value="Сказка">Сказка</SelectItem>
-                <SelectItem value="Детектив">Детектив</SelectItem>
-                <SelectItem value="Хоррор (юмористический)">Хоррор (юмористический)</SelectItem>
+                <SelectItem value="Смешная">
+                  <Dumbbell className="mr-2 h-4 w-4"/>
+                  Смешная
+                </SelectItem>
+                <SelectItem value="Фантастическая">
+                  <Tent className="mr-2 h-4 w-4"/>
+                  Фантастическая
+                </SelectItem>
+                <SelectItem value="Романтическая (с иронией)">
+                  <Heart className="mr-2 h-4 w-4"/>
+                  Романтическая (с иронией)
+                </SelectItem>
+                <SelectItem value="Как в кино">
+                  <Clapperboard className="mr-2 h-4 w-4"/>
+                  Как в кино
+                </SelectItem>
+                 <SelectItem value="Научная фантастика">
+                  <Microscope className="mr-2 h-4 w-4"/>
+                  Научная фантастика
+                </SelectItem>
+                <SelectItem value="Сказка">
+                  <BookOpen className="mr-2 h-4 w-4"/>
+                  Сказка
+                </SelectItem>
+                <SelectItem value="Детектив">
+                  <User className="mr-2 h-4 w-4"/>
+                  Детектив
+                </SelectItem>
+                <SelectItem value="Хоррор (юмористический)">
+                  <Ghost className="mr-2 h-4 w-4"/>
+                  Хоррор (юмористический)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -385,7 +426,7 @@ export default function Home() {
                 <Button asChild variant="outline">
                   <a href="https://boosty.to/altigerg" target="_blank" rel="noopener noreferrer">
                     <Heart className="mr-2 h-4 w-4"/>
-                    Поддержать проект
+                    Поддержать автора
                   </a>
                 </Button>
               </div>
