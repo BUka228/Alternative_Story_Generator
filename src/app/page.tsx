@@ -8,7 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Copy, Loader2, User, Star} from 'lucide-react';
+import {Copy, User, Star} from 'lucide-react';
 
 const questions = [
   {
@@ -294,7 +294,7 @@ export default function Home() {
               {isLoading ? (
                 <>
                   Генерация истории...
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                   <div className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-dashed border-white"></div>
                 </>
               ) : (
                 'Создать историю'
@@ -315,9 +315,11 @@ export default function Home() {
               <Label htmlFor="alternativeStory" className="text-sm font-medium text-a020f0">
                 Альтернативная история:
               </Label>
-              <div className="p-3 rounded-md bg-gray-100 text-gray-800">
-                <p className="story-text">{alternativeStory}</p>
-              </div>
+               <Card className="w-full rounded-xl shadow-lg">
+                  <CardContent className="space-y-4">
+                    <p className="story-text">{alternativeStory}</p>
+                  </CardContent>
+                </Card>
               <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                 <Copy className="mr-2 h-4 w-4" />
                 Скопировать текст
