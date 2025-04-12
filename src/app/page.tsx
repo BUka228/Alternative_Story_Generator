@@ -118,7 +118,7 @@ export default function Home() {
   const shareStory = async () => {
     const shareData = {
       title: 'История Наоборот',
-      text: alternativeStory,
+      text: `История Наоборот:\n\n${alternativeStory}\n\nПопробуйте создать свою историю: ${window.location.href}`,
       url: window.location.href, // Current page URL
     };
 
