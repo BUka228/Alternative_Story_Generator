@@ -14,46 +14,32 @@ const questions = [
   {
     id: 'question1',
     text: 'Где вы впервые НЕ встретились?',
-    options: ['На Луне', 'В жерле вулкана', 'На съезде любителей кактусов'],
   },
   {
     id: 'question2',
     text: 'Какое кодовое слово чуть НЕ стало началом вашей дружбы?',
-    options: ['Абракадабра', 'Сим-Салабим', 'Квинтэссенция'],
   },
   {
     id: 'question3',
     text: 'Какое супер-умение НЕ пригодилось вам в первый год?',
-    options: ['Левитация', 'Телепатия', 'Супер-скорость'],
   },
    {
     id: 'question4',
     text: 'Что вы точно НЕ делали вместе на первом свидании?',
-    options: ['Кормили голубей', 'Танцевали танго', 'Разговаривали о философии'],
   },
   {
     id: 'question5',
     text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?',
-    options: ['Дракон', 'Единорог', 'Крокодил'],
   },
 ];
 
 const crazyAnswers = {
-  question1: ['На Марсе', 'В холодильнике', 'На лекции по квантовой физике'],
-  question2: ['Рыба-меч', 'Фиолетовый бегемот', 'Синхрофазотрон'],
-  question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
-  question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
-  question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
-};
-
-const creativeAnswers = {
-   question1: ['На вершине Эвереста во время чаепития', 'Внутри гигантского пончика', 'Во время телепортации в разные вселенные'],
+  question1: ['На вершине Эвереста во время чаепития', 'Внутри гигантского пончика', 'Во время телепортации в разные вселенные'],
   question2: ['Фиолетовый нарвал шепчет', 'Банановая сингулярность', 'Электромагнитный импульс любви'],
   question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
   question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
   question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
 };
-
 
 export default function Home() {
   const [partner1Name, setPartner1Name] = useState('');
@@ -92,11 +78,12 @@ export default function Home() {
   };
 
   const generateRandomAnswers = () => {
-    setQuestion1Answer(creativeAnswers.question1[Math.floor(Math.random() * creativeAnswers.question1.length)]);
-    setQuestion2Answer(creativeAnswers.question2[Math.floor(Math.random() * creativeAnswers.question2.length)]);
-    setQuestion3Answer(creativeAnswers.question3[Math.floor(Math.random() * creativeAnswers.question3.length)]);
-     setQuestion4Answer(creativeAnswers.question4[Math.floor(Math.random() * creativeAnswers.question4.length)]);
-    setQuestion5Answer(creativeAnswers.question5[Math.floor(Math.random() * creativeAnswers.question5.length)]);
+    const answers = Object.values(crazyAnswers);
+    setQuestion1Answer(answers[0][Math.floor(Math.random() * answers[0].length)]);
+    setQuestion2Answer(answers[1][Math.floor(Math.random() * answers[1].length)]);
+    setQuestion3Answer(answers[2][Math.floor(Math.random() * answers[2].length)]);
+    setQuestion4Answer(answers[3][Math.floor(Math.random() * answers[3].length)]);
+    setQuestion5Answer(answers[4][Math.floor(Math.random() * answers[4].length)]);
   };
 
   const copyToClipboard = () => {
@@ -110,7 +97,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
-      <Card className="w-full max-w-md space-y-4 p-4 rounded-xl shadow-lg">
+      <Card className="w-full max-w-4xl space-y-4 p-4 rounded-xl shadow-lg">
         <CardHeader>
           <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
           <CardDescription className="text-sm text-muted-foreground text-center">
@@ -119,75 +106,128 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Separator className="my-4" />
-          <div className="space-y-2">
-            <Label htmlFor="partner1Name" className="text-sm font-medium">
-              <User className="mr-2 inline-block h-4 w-4" />
-              Имя первого партнера
-            </Label>
-            <Input
-              id="partner1Name"
-              type="text"
-              placeholder="Имя"
-              value={partner1Name}
-              onChange={(e) => setPartner1Name(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="partner2Name" className="text-sm font-medium">
-              <User className="mr-2 inline-block h-4 w-4" />
-              Имя второго партнера
-            </Label>
-            <Input
-              id="partner2Name"
-              type="text"
-              placeholder="Имя"
-              value={partner2Name}
-              onChange={(e) => setPartner2Name(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-            />
-          </div>
-          {questions.map((question) => (
-            <div key={question.id} className="space-y-2">
-              <Label htmlFor={question.id} className="text-sm font-medium">
-                {question.text}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="partner1Name" className="text-sm font-medium">
+                <User className="mr-2 inline-block h-4 w-4" />
+                Имя первого партнера
               </Label>
               <Input
-                id={question.id}
+                id="partner1Name"
                 type="text"
-                placeholder={question.id === 'question1' ? 'На вершине Эвереста во время чаепития' : question.id === 'question2' ? 'Фиолетовый нарвал шепчет' : question.id === 'question3' ? 'Левитация тостеров' : question.id === 'question4' ? 'Прыгали с парашютом' : 'Динозавр'}
-                value={question.id === 'question1' ? question1Answer : question.id === 'question2' ? question2Answer : question.id === 'question3' ? question3Answer : question.id === 'question4' ? question4Answer : question5Answer}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (question.id === 'question1') {
-                    setQuestion1Answer(value);
-                  } else if (question.id === 'question2') {
-                    setQuestion2Answer(value);
-                  } else if (question.id === 'question3') {
-                    setQuestion3Answer(value);
-                  }  else if (question.id === 'question4') {
-                    setQuestion4Answer(value);
-                  } else {
-                    setQuestion5Answer(value);
-                  }
-                }}
+                placeholder="Имя"
+                value={partner1Name}
+                onChange={(e) => setPartner1Name(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
               />
             </div>
-          ))}
-          <div className="space-y-2">
-            <Label htmlFor="yearsTogether" className="text-sm font-medium">
-              Сколько лет вы вместе?
-            </Label>
-            <Input
-              id="yearsTogether"
-              type="number"
-              min="1"
-              placeholder="Количество лет"
-              value={yearsTogether.toString()}
-              onChange={(e) => setYearsTogether(Number(e.target.value))}
-              className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-            />
+
+            <div className="space-y-2">
+              <Label htmlFor="partner2Name" className="text-sm font-medium">
+                <User className="mr-2 inline-block h-4 w-4" />
+                Имя второго партнера
+              </Label>
+              <Input
+                id="partner2Name"
+                type="text"
+                placeholder="Имя"
+                value={partner2Name}
+                onChange={(e) => setPartner2Name(e.target.value)}
+                className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="question1" className="text-sm font-medium">
+                  {questions[0].text}
+                </Label>
+                <Input
+                  id="question1"
+                  type="text"
+                  placeholder="На вершине Эвереста во время чаепития"
+                  value={question1Answer}
+                  onChange={(e) => setQuestion1Answer(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="question2" className="text-sm font-medium">
+                  {questions[1].text}
+                </Label>
+                <Input
+                  id="question2"
+                  type="text"
+                  placeholder="Фиолетовый нарвал шепчет"
+                  value={question2Answer}
+                  onChange={(e) => setQuestion2Answer(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+          </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="question3" className="text-sm font-medium">
+                  {questions[2].text}
+                </Label>
+                <Input
+                  id="question3"
+                  type="text"
+                  placeholder="Левитация тостеров"
+                  value={question3Answer}
+                  onChange={(e) => setQuestion3Answer(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+
+               <div className="space-y-2">
+                <Label htmlFor="question4" className="text-sm font-medium">
+                  {questions[3].text}
+                </Label>
+                <Input
+                  id="question4"
+                  type="text"
+                  placeholder="Прыгали с парашютом"
+                  value={question4Answer}
+                  onChange={(e) => setQuestion4Answer(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div className="space-y-2">
+                <Label htmlFor="question5" className="text-sm font-medium">
+                  {questions[4].text}
+                </Label>
+                <Input
+                  id="question5"
+                  type="text"
+                  placeholder="Динозавр"
+                  value={question5Answer}
+                  onChange={(e) => setQuestion5Answer(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="yearsTogether" className="text-sm font-medium">
+                  Сколько лет вы вместе?
+                </Label>
+                <Input
+                  id="yearsTogether"
+                  type="number"
+                  min="1"
+                  placeholder="Количество лет"
+                  value={yearsTogether.toString()}
+                  onChange={(e) => setYearsTogether(Number(e.target.value))}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
           </div>
 
           <div className="space-y-2">
@@ -207,28 +247,30 @@ export default function Home() {
             </Select>
           </div>
 
-          <Button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="w-full bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            {isLoading ? (
-              <>
-                Генерация истории...
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-              </>
-            ) : (
-              'Создать историю'
-            )}
-          </Button>
+          <div className="flex flex-col md:flex-row space-y-2 md:space-x-2 md:space-y-0">
+            <Button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="w-full md:w-auto bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              {isLoading ? (
+                <>
+                  Генерация истории...
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Создать историю'
+              )}
+            </Button>
 
-          <Button
-            type="button"
-            onClick={generateRandomAnswers}
-            className="mt-2 w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500"
-          >
-            Удиви меня!
-          </Button>
+            <Button
+              type="button"
+              onClick={generateRandomAnswers}
+              className="w-full md:w-auto rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+            >
+              Удиви меня!
+            </Button>
+          </div>
 
           {alternativeStory && (
             <div className="space-y-2 mt-4">
@@ -249,3 +291,4 @@ export default function Home() {
     </div>
   );
 }
+
