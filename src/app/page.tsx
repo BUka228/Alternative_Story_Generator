@@ -10,6 +10,12 @@ import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Copy, User, Star, Share2} from 'lucide-react';
 import {useToast} from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const questions = [
   {
@@ -119,12 +125,16 @@ export default function Home() {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
+        toast({
+          title: "Отправлено!",
+          description: "История отправлена!",
+        });
         console.log('Shared successfully');
       } catch (error) {
         console.error('Sharing failed:', error);
       }
     } else {
-      alert('Ваш браузер не поддерживает функцию "Поделиться".');
+      copyToClipboard();
     }
   };
 
@@ -346,12 +356,29 @@ export default function Home() {
                 Альтернативная история:
               </Label>
               <p className="story-text">{alternativeStory}</p>
-              <div className="flex space-x-2">
-                <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Поделиться
-                </Button>
-                 <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-x-2">
+                {navigator.share ? (
+                  <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Поделиться
+                  </Button>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                        <Share2 className="mr-2 h-4 w-4" />
+                        Поделиться
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem onClick={copyToClipboard}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Скопировать текст
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                   <Copy className="mr-2 h-4 w-4" />
                   Скопировать текст
                 </Button>
