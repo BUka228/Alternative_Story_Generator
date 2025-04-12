@@ -97,7 +97,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff">
-      <Card className="w-full max-w-4xl space-y-4 p-4 rounded-xl shadow-lg">
+      <Card className="w-full max-w-5xl space-y-4 p-4 rounded-xl shadow-lg">
         <CardHeader>
           <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
           <CardDescription className="text-sm text-muted-foreground text-center">
@@ -221,7 +221,7 @@ export default function Home() {
                 <Input
                   id="yearsTogether"
                   type="number"
-                  min="1"
+                  min="0"
                   placeholder="Количество лет"
                   value={yearsTogether.toString()}
                   onChange={(e) => setYearsTogether(Number(e.target.value))}
