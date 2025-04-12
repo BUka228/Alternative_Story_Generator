@@ -18,35 +18,73 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { BookOpen, Clapperboard, Dumbbell, Gem, Ghost, Microscope, Tent, Tv } from 'lucide-react';
 
-const questions = [
-  {
-    id: 'question1',
-    text: 'Где вы впервые НЕ встретились?',
-  },
-  {
-    id: 'question2',
-    text: 'Какое кодовое слово чуть НЕ стало началом вашей дружбы?',
-  },
-  {
-    id: 'question3',
-    text: 'Какое супер-умение НЕ пригодилось вам в первый год?',
-  },
-   {
-    id: 'question4',
-    text: 'Что вы точно НЕ делали вместе на первом свидании?',
-  },
-  {
-    id: 'question5',
-    text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?',
-  },
-];
+const questions = {
+  firstImpression: [
+    {
+      id: 'question1',
+      text: 'Где вы впервые НЕ встретились?',
+    },
+    {
+      id: 'question2',
+      text: 'Какое кодовое слово чуть НЕ стало началом вашей дружбы?',
+    },
+    {
+      id: 'question3',
+      text: 'Что вы точно НЕ надели бы на первое свидание?',
+    },
+  ],
+  awkwardMoments: [
+    {
+      id: 'question4',
+      text: 'Что самое абсурдное вы точно НЕ делали вместе?',
+    },
+    {
+      id: 'question5',
+      text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?',
+    },
+    {
+      id: 'question6',
+      text: 'Что ни в коем случае НЕ было забыто в важный момент?',
+    },
+  ],
+  hiddenTalents: [
+    {
+      id: 'question7',
+      text: 'Какое супер-умение НЕ пригодилось вам в первый год?',
+    },
+    {
+      id: 'question8',
+      text: 'Какое умение вы точно НЕ использовали, чтобы впечатлить друг друга?',
+    },
+     {
+      id: 'question9',
+      text: 'Какой талант точно НЕ помог вам избежать катастрофы?',
+    },
+  ],
+  randomEvents: [
+    {
+      id: 'question10',
+      text: 'Что вы точно НЕ делали вместе на первом свидании?',
+    },
+    {
+      id: 'question11',
+      text: 'Какое странное хобби точно НЕ стало вашим общим?',
+    },
+  ]
+};
 
 const crazyAnswers = {
   question1: ['На вершине Эвереста во время чаепития', 'Внутри гигантского пончика', 'Во время телепортации в разные вселенные'],
   question2: ['Фиолетовый нарвал шепчет', 'Банановая сингулярность', 'Электромагнитный импульс любви'],
-  question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
+  question3: ['Костюм банана', 'Платье из воздушных шаров', 'Шлем из фольги'],
   question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
   question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
+  question6: ['Зонтик в солнечный день', 'Запасной скафандр', 'Инструкция по выживанию в зомби-апокалипсисе'],
+  question7: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
+  question8: ['Поедание стекла', 'Разговор с дельфинами', 'Создание порталов в другие измерения'],
+   question9: ['Управление погодой', 'Телепортация', 'Предвидение будущего'],
+  question10: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
+  question11: ['Коллекционирование пуговиц', 'Выращивание светящихся грибов', 'Строительство замков из песка в космосе'],
 };
 
 const genreIcons = {
@@ -68,6 +106,7 @@ export default function Home() {
   const [question3Answer, setQuestion3Answer] = useState('');
   const [question4Answer, setQuestion4Answer] = useState('');
   const [question5Answer, setQuestion5Answer] = useState('');
+  const [question6Answer, setQuestion6Answer] = useState('');
   const [keyword1, setKeyword1] = useState('');
   const [keyword2, setKeyword2] = useState('');
   const [yearsTogether, setYearsTogether] = useState<number>(1);
@@ -97,6 +136,7 @@ export default function Home() {
         question3Answer,
         question4Answer,
         question5Answer,
+        question6Answer,
         keyword1,
         keyword2,
         yearsTogether,
@@ -118,6 +158,7 @@ export default function Home() {
     setQuestion3Answer(answers[2][Math.floor(Math.random() * answers[2].length)]);
     setQuestion4Answer(answers[3][Math.floor(Math.random() * answers[3].length)]);
     setQuestion5Answer(answers[4][Math.floor(Math.random() * answers[4].length)]);
+     setQuestion6Answer(answers[5][Math.floor(Math.random() * answers[5].length)]);
   };
 
   const copyToClipboard = () => {
@@ -160,6 +201,10 @@ export default function Home() {
     }
   };
 
+ const selectedQuestions = [
+    ...questions.firstImpression,
+    ...questions.awkwardMoments,
+  ];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff" style={{
@@ -211,97 +256,38 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="question1" className="text-sm font-medium">
-                  {questions[0].text}
-                </Label>
-                <Input
-                  id="question1"
-                  type="text"
-                  placeholder="На вершине Эвереста во время чаепития"
-                  value={question1Answer}
-                  onChange={(e) => setQuestion1Answer(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="question2" className="text-sm font-medium">
-                  {questions[1].text}
-                </Label>
-                <Input
-                  id="question2"
-                  type="text"
-                  placeholder="Фиолетовый нарвал шепчет"
-                  value={question2Answer}
-                  onChange={(e) => setQuestion2Answer(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
-          </div>
-
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="question3" className="text-sm font-medium">
-                  {questions[2].text}
-                </Label>
-                <Input
-                  id="question3"
-                  type="text"
-                  placeholder="Левитация тостеров"
-                  value={question3Answer}
-                  onChange={(e) => setQuestion3Answer(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
-
-               <div className="space-y-2">
-                <Label htmlFor="question4" className="text-sm font-medium">
-                  {questions[3].text}
-                </Label>
-                <Input
-                  id="question4"
-                  type="text"
-                  placeholder="Прыгали с парашютом"
-                  value={question4Answer}
-                  onChange={(e) => setQuestion4Answer(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
+              {selectedQuestions.map((question, index) => (
+                <div key={question.id} className="space-y-2">
+                  <Label htmlFor={question.id} className="text-sm font-medium">
+                    {question.text}
+                  </Label>
+                  <Input
+                    id={question.id}
+                    type="text"
+                    placeholder={crazyAnswers[question.id] ? crazyAnswers[question.id][0] : 'Ваш ответ'}
+                    value={
+                      question.id === 'question1' ? question1Answer :
+                      question.id === 'question2' ? question2Answer :
+                      question.id === 'question3' ? question3Answer :
+                      question.id === 'question4' ? question4Answer :
+                      question.id === 'question5' ? question5Answer :
+                       question.id === 'question6' ? question6Answer : ''
+                    }
+                    onChange={(e) => {
+                      if (question.id === 'question1') setQuestion1Answer(e.target.value);
+                      else if (question.id === 'question2') setQuestion2Answer(e.target.value);
+                      else if (question.id === 'question3') setQuestion3Answer(e.target.value);
+                      else if (question.id === 'question4') setQuestion4Answer(e.target.value);
+                      else if (question.id === 'question5') setQuestion5Answer(e.target.value);
+                      else if (question.id === 'question6') setQuestion6Answer(e.target.value);
+                    }}
+                    className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                  />
+                </div>
+              ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div className="space-y-2">
-                <Label htmlFor="question5" className="text-sm font-medium">
-                  {questions[4].text}
-                </Label>
-                <Input
-                  id="question5"
-                  type="text"
-                  placeholder="Динозавр"
-                  value={question5Answer}
-                  onChange={(e) => setQuestion5Answer(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
-                   <Star className="mr-2 inline-block h-4 w-4" />
-                  Сколько лет вы вместе?
-                </Label>
-                <Input
-                  id="yearsTogether"
-                  type="number"
-                  min="1"
-                  placeholder="Количество лет"
-                  value={yearsTogether.toString()}
-                  onChange={(e) => setYearsTogether(Number(e.target.value))}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
-                />
-              </div>
-          </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="keyword1" className="text-sm font-medium">
                   Ключевое слово 1
@@ -329,67 +315,85 @@ export default function Home() {
                   className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
                 />
               </div>
-            </div>
+          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="genre" className="text-sm font-medium">
-              Выберите тон истории
-            </Label>
-            <Select value={genre} onValueChange={setGenre}>
-              <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0">
-                <SelectValue placeholder="Выберите тон истории" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Смешная">
-                  <div className="flex items-center">
-                    <Dumbbell className="mr-2 h-4 w-4"/>
-                    Смешная
-                  </div>
-                </SelectItem>
-                <SelectItem value="Фантастическая">
-                   <div className="flex items-center">
-                    <Tent className="mr-2 h-4 w-4"/>
-                    Фантастическая
-                  </div>
-                </SelectItem>
-                <SelectItem value="Романтическая (с иронией)">
-                   <div className="flex items-center">
-                    <Heart className="mr-2 h-4 w-4"/>
-                    Романтическая (с иронией)
-                  </div>
-                </SelectItem>
-                <SelectItem value="Как в кино">
-                   <div className="flex items-center">
-                    <Clapperboard className="mr-2 h-4 w-4"/>
-                    Как в кино
-                  </div>
-                </SelectItem>
-                 <SelectItem value="Научная фантастика">
-                    <div className="flex items-center">
-                      <Microscope className="mr-2 h-4 w-4"/>
-                      Научная фантастика
-                    </div>
-                </SelectItem>
-                <SelectItem value="Сказка">
-                   <div className="flex items-center">
-                    <BookOpen className="mr-2 h-4 w-4"/>
-                    Сказка
-                  </div>
-                </SelectItem>
-                <SelectItem value="Детектив">
-                   <div className="flex items-center">
-                    <User className="mr-2 h-4 w-4"/>
-                    Детектив
-                  </div>
-                </SelectItem>
-                <SelectItem value="Хоррор (юмористический)">
-                   <div className="flex items-center">
-                    <Ghost className="mr-2 h-4 w-4"/>
-                    Хоррор (юмористический)
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
+                   <Star className="mr-2 inline-block h-4 w-4" />
+                  Сколько лет вы вместе?
+                </Label>
+                <Input
+                  id="yearsTogether"
+                  type="number"
+                  min="1"
+                  placeholder="Количество лет"
+                  value={yearsTogether.toString()}
+                  onChange={(e) => setYearsTogether(Number(e.target.value))}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="genre" className="text-sm font-medium">
+                  Выберите тон истории
+                </Label>
+                <Select value={genre} onValueChange={setGenre}>
+                  <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0">
+                    <SelectValue placeholder="Выберите тон истории" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Смешная">
+                      <div className="flex items-center">
+                        <Dumbbell className="mr-2 h-4 w-4"/>
+                        Смешная
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Фантастическая">
+                       <div className="flex items-center">
+                        <Tent className="mr-2 h-4 w-4"/>
+                        Фантастическая
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Романтическая (с иронией)">
+                       <div className="flex items-center">
+                        <Heart className="mr-2 h-4 w-4"/>
+                        Романтическая (с иронией)
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Как в кино">
+                       <div className="flex items-center">
+                        <Clapperboard className="mr-2 h-4 w-4"/>
+                        Как в кино
+                      </div>
+                    </SelectItem>
+                     <SelectItem value="Научная фантастика">
+                        <div className="flex items-center">
+                          <Microscope className="mr-2 h-4 w-4"/>
+                          Научная фантастика
+                        </div>
+                    </SelectItem>
+                    <SelectItem value="Сказка">
+                       <div className="flex items-center">
+                        <BookOpen className="mr-2 h-4 w-4"/>
+                        Сказка
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Детектив">
+                       <div className="flex items-center">
+                        <User className="mr-2 h-4 w-4"/>
+                        Детектив
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Хоррор (юмористический)">
+                       <div className="flex items-center">
+                        <Ghost className="mr-2 h-4 w-4"/>
+                        Хоррор (юмористический)
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
           </div>
 
           <div className="flex flex-col md:flex-row space-y-2 md:space-x-2 md:space-y-0">
