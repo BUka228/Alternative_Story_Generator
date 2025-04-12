@@ -8,6 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Copy, Loader2, User} from 'lucide-react';
 
 const questions = [
   {
@@ -108,9 +109,10 @@ export default function Home() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Separator />
+          <Separator className="my-4" />
           <div className="space-y-2">
             <Label htmlFor="partner1Name" className="text-sm font-medium">
+              <User className="mr-2 inline-block h-4 w-4" />
               Имя первого партнера
             </Label>
             <Input
@@ -124,6 +126,7 @@ export default function Home() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="partner2Name" className="text-sm font-medium">
+              <User className="mr-2 inline-block h-4 w-4" />
               Имя второго партнера
             </Label>
             <Input
@@ -170,7 +173,7 @@ export default function Home() {
             <Input
               id="yearsTogether"
               type="number"
-              min="0"
+              min="1"
               placeholder="Количество лет"
               value={yearsTogether.toString()}
               onChange={(e) => setYearsTogether(Number(e.target.value))}
@@ -200,7 +203,14 @@ export default function Home() {
             disabled={isLoading}
             className="w-full bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            {isLoading ? 'Генерация истории...' : 'Создать историю'}
+            {isLoading ? (
+              <>
+                Генерация истории...
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              'Создать историю'
+            )}
           </Button>
 
           <Button
@@ -220,6 +230,7 @@ export default function Home() {
                 {alternativeStory}
               </div>
               <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                <Copy className="mr-2 h-4 w-4" />
                 Скопировать текст
               </Button>
             </div>
