@@ -46,6 +46,15 @@ const crazyAnswers = {
   question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
 };
 
+const creativeAnswers = {
+   question1: ['На вершине Эвереста во время чаепития', 'Внутри гигантского пончика', 'Во время телепортации в разные вселенные'],
+  question2: ['Фиолетовый нарвал шепчет', 'Банановая сингулярность', 'Электромагнитный импульс любви'],
+  question3: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
+  question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
+  question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
+};
+
+
 export default function Home() {
   const [partner1Name, setPartner1Name] = useState('');
   const [partner2Name, setPartner2Name] = useState('');
@@ -83,11 +92,11 @@ export default function Home() {
   };
 
   const generateRandomAnswers = () => {
-    setQuestion1Answer(crazyAnswers.question1[Math.floor(Math.random() * crazyAnswers.question1.length)]);
-    setQuestion2Answer(crazyAnswers.question2[Math.floor(Math.random() * crazyAnswers.question2.length)]);
-    setQuestion3Answer(crazyAnswers.question3[Math.floor(Math.random() * crazyAnswers.question3.length)]);
-     setQuestion4Answer(crazyAnswers.question4[Math.floor(Math.random() * crazyAnswers.question4.length)]);
-    setQuestion5Answer(crazyAnswers.question5[Math.floor(Math.random() * crazyAnswers.question5.length)]);
+    setQuestion1Answer(creativeAnswers.question1[Math.floor(Math.random() * creativeAnswers.question1.length)]);
+    setQuestion2Answer(creativeAnswers.question2[Math.floor(Math.random() * creativeAnswers.question2.length)]);
+    setQuestion3Answer(creativeAnswers.question3[Math.floor(Math.random() * creativeAnswers.question3.length)]);
+     setQuestion4Answer(creativeAnswers.question4[Math.floor(Math.random() * creativeAnswers.question4.length)]);
+    setQuestion5Answer(creativeAnswers.question5[Math.floor(Math.random() * creativeAnswers.question5.length)]);
   };
 
   const copyToClipboard = () => {
