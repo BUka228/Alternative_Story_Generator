@@ -6,7 +6,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
-import {useState} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Copy, User, Star, Share2, Heart} from 'lucide-react';
 import {useToast} from "@/hooks/use-toast";
@@ -75,6 +75,16 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [genre, setGenre] = useState('Смешная');
   const {toast} = useToast();
+  const storyRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (alternativeStory && storyRef.current) {
+      storyRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [alternativeStory]);
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -330,35 +340,35 @@ export default function Home() {
                 <SelectValue placeholder="Выберите тон истории" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Смешная">
+                <SelectItem value="Смешная" className="flex items-center">
                   <Dumbbell className="mr-2 h-4 w-4"/>
                   Смешная
                 </SelectItem>
-                <SelectItem value="Фантастическая">
+                <SelectItem value="Фантастическая" className="flex items-center">
                   <Tent className="mr-2 h-4 w-4"/>
                   Фантастическая
                 </SelectItem>
-                <SelectItem value="Романтическая (с иронией)">
+                <SelectItem value="Романтическая (с иронией)" className="flex items-center">
                   <Heart className="mr-2 h-4 w-4"/>
                   Романтическая (с иронией)
                 </SelectItem>
-                <SelectItem value="Как в кино">
+                <SelectItem value="Как в кино" className="flex items-center">
                   <Clapperboard className="mr-2 h-4 w-4"/>
                   Как в кино
                 </SelectItem>
-                 <SelectItem value="Научная фантастика">
+                 <SelectItem value="Научная фантастика" className="flex items-center">
                   <Microscope className="mr-2 h-4 w-4"/>
                   Научная фантастика
                 </SelectItem>
-                <SelectItem value="Сказка">
+                <SelectItem value="Сказка" className="flex items-center">
                   <BookOpen className="mr-2 h-4 w-4"/>
                   Сказка
                 </SelectItem>
-                <SelectItem value="Детектив">
+                <SelectItem value="Детектив" className="flex items-center">
                   <User className="mr-2 h-4 w-4"/>
                   Детектив
                 </SelectItem>
-                <SelectItem value="Хоррор (юмористический)">
+                <SelectItem value="Хоррор (юмористический)" className="flex items-center">
                   <Ghost className="mr-2 h-4 w-4"/>
                   Хоррор (юмористический)
                 </SelectItem>
@@ -396,7 +406,7 @@ export default function Home() {
               <Label htmlFor="alternativeStory" className="text-sm font-medium text-a020f0">
                 Альтернативная история:
               </Label>
-              <p className="story-text">{alternativeStory}</p>
+              <p className="story-text" ref={storyRef}>{alternativeStory}</p>
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-x-2">
                 {navigator.share ? (
                   <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
