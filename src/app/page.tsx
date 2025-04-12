@@ -9,6 +9,7 @@ import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Copy, User, Star, Share2} from 'lucide-react';
+import {useToast} from "@/hooks/use-toast";
 
 const questions = [
   {
@@ -55,6 +56,7 @@ export default function Home() {
   const [alternativeStory, setAlternativeStory] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [genre, setGenre] = useState('Смешная');
+  const {toast} = useToast();
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -90,13 +92,33 @@ export default function Home() {
     setQuestion5Answer(answers[4][Math.floor(Math.random() * answers[4].length)]);
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(alternativeStory).then(() => {
+      toast({
+        title: "История скопирована!",
+        description: "Теперь вы можете поделиться ею где угодно.",
+      });
+    }).catch(err => {
+      toast({
+        title: "Ошибка копирования",
+        description: "Не удалось скопировать историю. Попробуйте еще раз.",
+        variant: "destructive",
+      });
+      console.error("Failed to copy text: ", err);
+    });
+  };
+
+
   const shareStory = async () => {
+    const shareData = {
+      title: 'История Наоборот',
+      text: alternativeStory,
+      url: window.location.href, // Current page URL
+    };
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: 'История Наоборот',
-          text: alternativeStory,
-        });
+        await navigator.share(shareData);
         console.log('Shared successfully');
       } catch (error) {
         console.error('Sharing failed:', error);
@@ -324,10 +346,16 @@ export default function Home() {
                 Альтернативная история:
               </Label>
               <p className="story-text">{alternativeStory}</p>
+              <div className="flex space-x-2">
                 <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
                   <Share2 className="mr-2 h-4 w-4" />
                   Поделиться
                 </Button>
+                 <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                  <Copy className="mr-2 h-4 w-4" />
+                  Скопировать текст
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
