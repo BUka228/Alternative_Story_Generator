@@ -19,6 +19,8 @@ const GenerateAlternativeStoryInputSchema = z.object({
   question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
   question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
   question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
+  keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
+  keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
   yearsTogether: z.number().describe('The number of years the couple has been together.'),
   genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
 });
@@ -44,6 +46,8 @@ const prompt = ai.definePrompt({
       question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
       question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
       question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
+      keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
+      keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
       yearsTogether: z.number().describe('The number of years the couple has been together.'),
       genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино).'),
     }),
@@ -55,15 +59,21 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are a creative writer specializing in humorous and fictional stories.
 
-  Based on the provided answers to the multiple-choice questions, the number of years the couple has been together, and the selected genre, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected. Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian. The story should be in the "{{{genre}}}" genre.
+  Based on the provided answers to the multiple-choice questions, the number of years the couple has been together, and the selected genre, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected. Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian. The story should be in the "{{{genre}}}" genre. Try to use the provided keyword(s) to make the story more unique and personal.
 
   Question 1 Answer: {{{question1Answer}}}
   Question 2 Answer: {{{question2Answer}}}
   Question 3 Answer: {{{question3Answer}}}
   Question 4 Answer: {{{question4Answer}}}
   Question 5 Answer: {{{question5Answer}}}
+  {{#if keyword1}}
+  Keyword 1: {{{keyword1}}}
+  {{/if}}
+   {{#if keyword2}}
+  Keyword 2: {{{keyword2}}}
+  {{/if}}
 
-  Alternative Story:`, 
+  Alternative Story:`,
 });
 
 const generateAlternativeStoryFlow = ai.defineFlow<
@@ -77,4 +87,3 @@ const generateAlternativeStoryFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
-

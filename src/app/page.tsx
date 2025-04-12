@@ -8,7 +8,7 @@ import {Label} from '@/components/ui/label';
 import {Separator} from '@/components/ui/separator';
 import {useState} from 'react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Copy, Loader2, User} from 'lucide-react';
+import {Copy, Loader2, User, Star} from 'lucide-react';
 
 const questions = [
   {
@@ -49,6 +49,8 @@ export default function Home() {
   const [question3Answer, setQuestion3Answer] = useState('');
   const [question4Answer, setQuestion4Answer] = useState('');
   const [question5Answer, setQuestion5Answer] = useState('');
+  const [keyword1, setKeyword1] = useState('');
+  const [keyword2, setKeyword2] = useState('');
   const [yearsTogether, setYearsTogether] = useState<number>(1);
   const [alternativeStory, setAlternativeStory] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +67,8 @@ export default function Home() {
         question3Answer,
         question4Answer,
         question5Answer,
+        keyword1,
+        keyword2,
         yearsTogether,
         genre,
       });
@@ -109,8 +113,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="partner1Name" className="text-sm font-medium">
-                <User className="mr-2 inline-block h-4 w-4" />
+              <Label htmlFor="partner1Name" className="text-sm font-medium flex items-center">
+                <User className="mr-2 h-4 w-4" />
                 Имя первого партнера
               </Label>
               <Input
@@ -124,8 +128,8 @@ export default function Home() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="partner2Name" className="text-sm font-medium">
-                <User className="mr-2 inline-block h-4 w-4" />
+              <Label htmlFor="partner2Name" className="text-sm font-medium flex items-center">
+                <User className="mr-2 h-4 w-4" />
                 Имя второго партнера
               </Label>
               <Input
@@ -215,13 +219,14 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="yearsTogether" className="text-sm font-medium">
+                <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
+                   <Star className="mr-2 inline-block h-4 w-4" />
                   Сколько лет вы вместе?
                 </Label>
                 <Input
                   id="yearsTogether"
                   type="number"
-                  min="0"
+                  min="1"
                   placeholder="Количество лет"
                   value={yearsTogether.toString()}
                   onChange={(e) => setYearsTogether(Number(e.target.value))}
@@ -229,6 +234,35 @@ export default function Home() {
                 />
               </div>
           </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="keyword1" className="text-sm font-medium">
+                  Ключевое слово 1
+                </Label>
+                <Input
+                  id="keyword1"
+                  type="text"
+                  placeholder="Секретное прозвище"
+                  value={keyword1}
+                  onChange={(e) => setKeyword1(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="keyword2" className="text-sm font-medium">
+                  Ключевое слово 2
+                </Label>
+                <Input
+                  id="keyword2"
+                  type="text"
+                  placeholder="Памятное место"
+                  value={keyword2}
+                  onChange={(e) => setKeyword2(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                />
+              </div>
+            </div>
 
           <div className="space-y-2">
             <Label htmlFor="genre" className="text-sm font-medium">
@@ -243,6 +277,10 @@ export default function Home() {
                 <SelectItem value="Фантастическая">Фантастическая</SelectItem>
                 <SelectItem value="Романтическая (с иронией)">Романтическая (с иронией)</SelectItem>
                 <SelectItem value="Как в кино">Как в кино</SelectItem>
+                 <SelectItem value="Научная фантастика">Научная фантастика</SelectItem>
+                <SelectItem value="Сказка">Сказка</SelectItem>
+                <SelectItem value="Детектив">Детектив</SelectItem>
+                <SelectItem value="Хоррор (юмористический)">Хоррор (юмористический)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -291,4 +329,3 @@ export default function Home() {
     </div>
   );
 }
-
