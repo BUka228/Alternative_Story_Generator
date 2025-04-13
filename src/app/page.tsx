@@ -80,36 +80,47 @@ const genreDetails: { [key: string]: { icon: React.ElementType, className: strin
     "Вестерн": { icon: Combine, className: 'story-genre-western' }, // Используем Combine
     "Нуар": { icon: Coffee, className: 'story-genre-noir' }, // Используем Coffee
 };
+
+// --- Массив сообщений для загрузки ---
+const loadingMessages = [
+    "Подбираем рифмы к слову 'вулкан'...",
+    "Консультируемся с музами абсурда...",
+    "Переписываем законы физики...",
+    "Ищем НЕсуществующие совпадения...",
+    "Генерируем альтернативную реальность...",
+    "Добавляем щепотку безумия...",
+    "Настраиваем потоки юмора...",
+    "Заряжаем генератор нелепостей...",
+    "Оживляем самые смелые НЕ-фантазии...",
+    "Почти готово, осталось НЕ перепутать имена!",
+];
+
 // --- Конец констант ---
 
 export default function Home() {
   // --- Состояния компонента ---
   const [partner1Name, setPartner1Name] = useState('');
   const [partner2Name, setPartner2Name] = useState('');
-  // === Новые состояния для обращений ===
   const [partner1PetName, setPartner1PetName] = useState('');
   const [partner2PetName, setPartner2PetName] = useState('');
-  // === Состояния для вопросов 1-6 ===
   const [question1Answer, setQuestion1Answer] = useState('');
   const [question2Answer, setQuestion2Answer] = useState('');
   const [question3Answer, setQuestion3Answer] = useState('');
   const [question4Answer, setQuestion4Answer] = useState('');
   const [question5Answer, setQuestion5Answer] = useState('');
   const [question6Answer, setQuestion6Answer] = useState('');
-  // === Новые состояния для вопросов 7-8 ===
   const [question7Answer, setQuestion7Answer] = useState('');
   const [question8Answer, setQuestion8Answer] = useState('');
-  // === Состояния для ключевых слов ===
   const [keyword1, setKeyword1] = useState('');
   const [keyword2, setKeyword2] = useState('');
-  // === Новое состояние для 3-го ключевого слова ===
   const [keyword3, setKeyword3] = useState('');
-  // === Остальные состояния ===
   const [yearsTogether, setYearsTogether] = useState<number>(1);
   const [alternativeStory, setAlternativeStory] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [genre, setGenre] = useState('Смешная');
+  // === Новое состояние для сообщения загрузки ===
+  const [loadingMessage, setLoadingMessage] = useState('');
   // --- Конец состояний ---
 
   // --- Хуки ---
@@ -117,11 +128,13 @@ export default function Home() {
   const { toast } = useToast();
   const storyTextRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
+  // === Ref для интервала смены сообщений ===
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   // --- Конец хуков ---
 
   // --- Эффекты ---
   useEffect(() => {
-    // ... (скролл без изменений) ...
+    // Скролл к результату (без изменений)
       if (alternativeStory && storyTextRef.current) {
         const timer = setTimeout(() => {
             if (storyTextRef.current) {
@@ -131,6 +144,15 @@ export default function Home() {
         return () => clearTimeout(timer);
       }
   }, [alternativeStory]);
+
+  // Очистка интервала при размонтировании
+  useEffect(() => {
+      return () => {
+          if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+          }
+      };
+  }, []);
   // --- Конец эффектов ---
 
   // Определяем, какие вопросы показывать (теперь включает 8)
@@ -143,24 +165,31 @@ export default function Home() {
   // --- Функции-обработчики ---
   const handleSubmit = async () => {
     setIsGenerating(true);
+    setLoadingMessage(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]); // Установить первое случайное сообщение
     setAlternativeStory('');
+
+    // Запускаем интервал смены сообщений
+    intervalRef.current = setInterval(() => {
+        setLoadingMessage(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
+    }, 3000); // Меняем каждые 3 секунды
+
     try {
       const result = await generateAlternativeStory({
         partner1Name,
         partner2Name,
-        partner1PetName, // Добавили обращение 1
-        partner2PetName, // Добавили обращение 2
+        partner1PetName,
+        partner2PetName,
         question1Answer,
         question2Answer,
         question3Answer,
         question4Answer,
         question5Answer,
         question6Answer,
-        question7Answer, // Добавили ответ 7
-        question8Answer, // Добавили ответ 8
+        question7Answer,
+        question8Answer,
         keyword1,
         keyword2,
-        keyword3, // Добавили слово 3
+        keyword3,
         yearsTogether: Number(yearsTogether) || 1,
         genre,
       });
@@ -171,6 +200,12 @@ export default function Home() {
       setAlternativeStory('');
     } finally {
       setIsGenerating(false);
+      // Очищаем интервал и сообщение после завершения
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      setLoadingMessage('');
     }
   };
 
@@ -327,22 +362,20 @@ export default function Home() {
   // --- Рендеринг компонента ---
   return (
     <TooltipProvider>
-      <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 bg-f0f8ff relative overflow-x-hidden">
+      {/* Убрали bg-f0f8ff отсюда, т.к. фон теперь на body */}
+      <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 relative overflow-x-hidden">
 
-        {/* --- Меню пользователя (без изменений) --- */}
+        {/* --- Меню пользователя (добавим анимацию) --- */}
          <div className="absolute top-4 right-4 z-50">
-             {/* ... код меню ... */}
              <DropdownMenu>
                  <DropdownMenuTrigger asChild>
-                     <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm hover:bg-accent/90 border-border/50 shadow-md">
-                         {/* Обертка span для кнопки в DropdownMenuTrigger */}
+                     <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm hover:bg-accent/90 border-border/50 shadow-md interactive-scale">
                          <span className="flex items-center justify-center">
                             <User className="h-5 w-5" />
                          </span>
                          <span className="sr-only">Открыть меню пользователя</span>
                      </Button>
                  </DropdownMenuTrigger>
-                 {/* ... контент меню ... */}
                  <DropdownMenuContent align="end" className="w-56">
                  {currentUser ? (
                    <>
@@ -382,10 +415,11 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-5xl"
         >
-          <Card className="space-y-4 p-6 md:p-8 rounded-xl shadow-lg bg-card/90 backdrop-blur-sm border border-border/30">
+          {/* Добавляем анимацию тени */}
+          <Card className="space-y-4 p-6 md:p-8 rounded-xl shadow-lg bg-card/90 backdrop-blur-sm border border-border/30 interactive-shadow">
             <CardHeader className="p-0 mb-4">
-                {/* ... заголовок ... */}
-                <CardTitle className="title text-2xl md:text-3xl font-semibold text-center text-a020f0">
+                {/* Применяем класс title */}
+                <CardTitle className="title text-3xl md:text-4xl font-bold text-center text-a020f0">
                   История Наоборот
                 </CardTitle>
                 <CardDescription className="text-sm text-muted-foreground text-center">
@@ -470,7 +504,7 @@ export default function Home() {
                           else if (question.id === 'question7') setQuestion7Answer(value); // Добавили 7
                           else if (question.id === 'question8') setQuestion8Answer(value); // Добавили 8
                         }}
-                        className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                        className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale" /* Добавили анимацию */
                       />
                     </motion.div>
                   ))}
@@ -486,14 +520,14 @@ export default function Home() {
                       Ключевое слово 1 (необяз.)
                       <Tooltip><TooltipTrigger asChild><HelpCircle className="ml-1 h-3 w-3 text-muted-foreground cursor-help" /></TooltipTrigger><TooltipContent><p>Слово/фраза для уникальности.</p></TooltipContent></Tooltip>
                     </Label>
-                    <Input id="keyword1" type="text" placeholder="Любимая еда..." value={keyword1} onChange={(e) => setKeyword1(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"/>
+                    <Input id="keyword1" type="text" placeholder="Любимая еда..." value={keyword1} onChange={(e) => setKeyword1(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale"/>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="keyword2" className="text-sm font-medium flex items-center">
                       Ключевое слово 2 (необяз.)
                        <Tooltip><TooltipTrigger asChild><HelpCircle className="ml-1 h-3 w-3 text-muted-foreground cursor-help" /></TooltipTrigger><TooltipContent><p>Еще одно слово/фраза.</p></TooltipContent></Tooltip>
                     </Label>
-                    <Input id="keyword2" type="text" placeholder="Общий мем..." value={keyword2} onChange={(e) => setKeyword2(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"/>
+                    <Input id="keyword2" type="text" placeholder="Общий мем..." value={keyword2} onChange={(e) => setKeyword2(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale"/>
                   </div>
                   {/* === Новое поле для 3-го слова === */}
                   <div className="space-y-2">
@@ -501,7 +535,7 @@ export default function Home() {
                       Ключевое слово 3 (необяз.)
                        <Tooltip><TooltipTrigger asChild><HelpCircle className="ml-1 h-3 w-3 text-muted-foreground cursor-help" /></TooltipTrigger><TooltipContent><p>И еще одно для вдохновения ИИ!</p></TooltipContent></Tooltip>
                     </Label>
-                    <Input id="keyword3" type="text" placeholder="Тайное желание..." value={keyword3} onChange={(e) => setKeyword3(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"/>
+                    <Input id="keyword3" type="text" placeholder="Тайное желание..." value={keyword3} onChange={(e) => setKeyword3(e.target.value)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale"/>
                   </div>
               </div>
               {/* --- Конец Ключевых слов --- */}
@@ -511,25 +545,23 @@ export default function Home() {
               {/* --- Годы и Жанр (выпадающий список обновлен) --- */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:items-start">
                   <div className="space-y-2">
-                      {/* ... поле Годы вместе без изменений ... */}
                        <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
                            <Star className="mr-2 inline-block h-4 w-4 text-yellow-500" /> Сколько лет вы вместе?
                            <Tooltip><TooltipTrigger asChild><HelpCircle className="ml-1 h-3 w-3 text-muted-foreground cursor-help" /></TooltipTrigger><TooltipContent><p>Число лет будет забавно вплетено в историю.</p></TooltipContent></Tooltip>
                        </Label>
-                       <Input id="yearsTogether" type="number" min="0" placeholder="Например, 5" value={yearsTogether.toString()} onChange={(e) => setYearsTogether(Number(e.target.value) >= 0 ? Number(e.target.value) : 0)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"/>
+                       <Input id="yearsTogether" type="number" min="0" placeholder="Например, 5" value={yearsTogether.toString()} onChange={(e) => setYearsTogether(Number(e.target.value) >= 0 ? Number(e.target.value) : 0)} className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale"/>
                   </div>
                   <div className="space-y-2">
-                     {/* ... Label Жанр без изменений ... */}
                      <Label htmlFor="genre" className="text-sm font-medium flex items-center">
                          Выберите тон / жанр истории
                          <Tooltip><TooltipTrigger asChild><HelpCircle className="ml-1 h-3 w-3 text-muted-foreground cursor-help" /></TooltipTrigger><TooltipContent><p>Задайте настроение вашей вымышленной истории.</p></TooltipContent></Tooltip>
                      </Label>
                      <Select value={genre} onValueChange={setGenre}>
-                        <SelectTrigger className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0">
+                        {/* Добавляем анимацию к триггеру Select */}
+                        <SelectTrigger className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0 interactive-scale">
                            <SelectValue placeholder="Выберите тон истории" />
                         </SelectTrigger>
                         <SelectContent>
-                           {/* Используем обновленный genreDetails */}
                            {Object.entries(genreDetails).map(([genreName, details]) => (
                            <SelectItem key={genreName} value={genreName}>
                               <div className="flex items-center">
@@ -548,21 +580,26 @@ export default function Home() {
 
               {/* --- Кнопки действий --- */}
                <div className="flex flex-col md:flex-row gap-3">
-                 {/* Кнопка Создать */}
-                 <Button onClick={handleSubmit} disabled={isGenerating || !partner1Name || !partner2Name} className="flex-1 bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 py-3 text-base">
+                 {/* Кнопка Создать - добавляем анимацию и отображение loadingMessage */}
+                 <Button
+                   onClick={handleSubmit}
+                   disabled={isGenerating || !partner1Name || !partner2Name}
+                   className="flex-1 bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 py-3 text-base interactive-scale" /* Добавили анимацию */
+                 >
                    {isGenerating ? (
-                     <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                     <span className="inline-flex items-center justify-center px-2"> {/* Добавили padding для читаемости */}
                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                       Генерация...
+                       {/* Отображаем меняющееся сообщение или дефолтное */}
+                       {loadingMessage || 'Генерация...'}
                      </span>
                    ) : (
                      'Создать историю!'
                    )}
                  </Button>
-                 {/* Кнопка Удиви меня */}
+                 {/* Кнопка Удиви меня - добавляем анимацию */}
                  <Tooltip>
                    <TooltipTrigger asChild>
-                       <Button type="button" onClick={generateRandomAnswers} variant="outline" className="flex-1 rounded-md shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500 py-3 text-base">
+                       <Button type="button" onClick={generateRandomAnswers} variant="outline" className="flex-1 rounded-md shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500 py-3 text-base interactive-scale">
                            Удиви меня! (Случайные ответы)
                        </Button>
                    </TooltipTrigger>
@@ -588,44 +625,43 @@ export default function Home() {
                         {alternativeStory}
                       </p>
                       <div className="flex flex-col sm:flex-row gap-2 flex-wrap justify-center pt-2">
-                        {/* Кнопка Сохранить */}
+                        {/* Кнопка Сохранить - добавляем анимацию */}
                         {currentUser && (
-                          <Button onClick={handleSaveStory} disabled={isSaving} className="min-w-[160px] bg-green-600 hover:bg-green-700 text-white">
+                          <Button onClick={handleSaveStory} disabled={isSaving} className="min-w-[160px] bg-green-600 hover:bg-green-700 text-white interactive-scale">
                             {isSaving ? (
-                               <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                               <span className="inline-flex items-center justify-center">
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                </span>
                             ) : (
-                                <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                                <span className="inline-flex items-center justify-center">
                                    <Heart className="mr-2 h-4 w-4" /> Сохранить
                                 </span>
                             )}
-                             {/* Добавили текст Сохранить и для isSaving=true, чтобы размер кнопки не прыгал (хотя иконка будет слева) */}
                              {!isSaving && <span className="sr-only"> Сохранить</span>}
-                             {isSaving && <span className="ml-2">Сохранение...</span>} {/* Или показываем текст рядом с лоадером */}
+                             {isSaving && <span className="ml-2">Сохранение...</span>}
                           </Button>
                          )}
-                         {/* Кнопка Копировать */}
-                        <Button onClick={copyToClipboard} className="min-w-[160px]" variant="outline">
-                           <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                         {/* Кнопка Копировать - добавляем анимацию */}
+                        <Button onClick={copyToClipboard} className="min-w-[160px] interactive-scale" variant="outline">
+                           <span className="inline-flex items-center justify-center">
                              <Copy className="mr-2 h-4 w-4" /> Скопировать текст
                            </span>
                         </Button>
-                        {/* Кнопка Поделиться */}
+                        {/* Кнопка Поделиться - добавляем анимацию */}
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button onClick={shareStory} className="min-w-[160px]" variant="outline" disabled={!alternativeStory}>
-                                    <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                                <Button onClick={shareStory} className="min-w-[160px] interactive-scale" variant="outline" disabled={!alternativeStory}>
+                                    <span className="inline-flex items-center justify-center">
                                         <Share2 className="mr-2 h-4 w-4" /> Поделиться
                                     </span>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom"> <p>{typeof navigator.share !== 'undefined' ? 'Поделиться через стандартное меню ОС' : 'Скопировать текст (функция "Поделиться" недоступна)'}</p> </TooltipContent>
                         </Tooltip>
-                        {/* Кнопка Поддержать */}
-                         <Button asChild variant="outline" className="min-w-[160px]">
+                        {/* Кнопка Поддержать - добавляем анимацию */}
+                         <Button asChild variant="outline" className="min-w-[160px] interactive-scale">
                             <a href="https://boosty.to/altigerg" target="_blank" rel="noopener noreferrer">
-                                <span className="inline-flex items-center justify-center"> {/* Обертка span */}
+                                <span className="inline-flex items-center justify-center">
                                     <Heart className="mr-2 h-4 w-4 text-red-500"/> Поддержать автора
                                 </span>
                             </a>
@@ -645,4 +681,3 @@ export default function Home() {
   );
   // --- Конец Рендеринга ---
 }
-

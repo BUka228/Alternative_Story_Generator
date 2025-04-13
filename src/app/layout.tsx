@@ -1,12 +1,12 @@
+
 import type { Metadata } from 'next';
 // Импортируем нужные шрифты из next/font/google
 import { Geist, Geist_Mono } from 'next/font/google';
-import { Caveat, Orbitron, Cinzel } from 'next/font/google'; // <-- Добавляем шрифты для жанров
+import { Caveat, Orbitron, Cinzel } from 'next/font/google'; // <-- Caveat уже здесь
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from "@/components/ui/toaster";
 // Убираем TooltipProvider отсюда, добавим его в page.tsx, т.к. он нужен только там
-// import { TooltipProvider } from '@/components/ui/tooltip'; // <-- Убираем
 
 const geistSans = Geist({
   variable: '--font-geist-sans', // Основной шрифт
@@ -18,11 +18,11 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-// Инициализируем шрифты для жанров
+// Инициализируем шрифты для жанров (Caveat - шрифт Сказки, используем его и для заголовка)
 const caveat = Caveat({
-  variable: '--font-caveat', // Сказка
-  subsets: ['latin', 'cyrillic'], // Указываем нужные подмножества
-  weight: ['400', '700'], // Указываем нужные веса
+  variable: '--font-caveat', // Используем для Сказки и Заголовка
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '700'],
 });
 
 const orbitron = Orbitron({
