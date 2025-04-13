@@ -1,3 +1,4 @@
+// src/hooks/use-toast.ts
 "use client"
 
 // Inspired by react-hot-toast library
@@ -9,7 +10,8 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+// const TOAST_REMOVE_DELAY = 1000000 // Старое значение
+const TOAST_REMOVE_DELAY = 5000 // Новое значение (5 секунд)
 
 type ToasterToast = ToastProps & {
   id: string
@@ -142,7 +144,8 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+// --- Обновляем функцию toast, чтобы по умолчанию использовалась новая задержка ---
+function toast({ duration = TOAST_REMOVE_DELAY, ...props }: Toast & { duration?: number }) {
   const id = genId()
 
   const update = (props: ToasterToast) =>
@@ -164,12 +167,27 @@ function toast({ ...props }: Toast) {
     },
   })
 
+  // Устанавливаем таймаут для автоматического скрытия
+  if (duration !== Infinity) {
+    // Очищаем предыдущий таймаут для этого ID, если он был
+    if (toastTimeouts.has(id)) {
+        clearTimeout(toastTimeouts.get(id));
+    }
+    const timeout = setTimeout(() => {
+        dismiss();
+    }, duration);
+    toastTimeouts.set(id, timeout);
+  }
+
+
   return {
     id: id,
     dismiss,
     update,
   }
 }
+// --- Конец обновления функции toast ---
+
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)

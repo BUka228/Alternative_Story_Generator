@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase/firebaseConfig';
-import { collection, query, where, orderBy, getDocs, Timestamp, deleteDoc, doc } from 'firebase/firestore'; // Добавили deleteDoc, doc
+import { collection, query, where, orderBy, getDocs, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { Loader2, ArrowLeft, Trash2 } from 'lucide-react'; // Добавили Trash2
+import { Loader2, ArrowLeft, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link'; // Добавили импорт Link
-import { useToast } from '@/hooks/use-toast'; // Для уведомлений об удалении
+import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,11 +20,11 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog" // Для подтверждения удаления
+} from "@/components/ui/alert-dialog";
 
 interface Story {
     id: string;
-    partner1Name?: string; // Сделаем необязательными для гибкости
+    partner1Name?: string;
     partner2Name?: string;
     storyText: string;
     createdAt: any;
@@ -39,7 +39,7 @@ export default function MyStoriesPage() {
   const [loadingStories, setLoadingStories] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { toast } = useToast(); // Инициализируем toast
+  const { toast } = useToast();
 
   useEffect(() => {
     if (authLoading) return;
@@ -76,10 +76,10 @@ export default function MyStoriesPage() {
   }, [currentUser, authLoading, router]);
 
   const handleDeleteStory = async (storyId: string) => {
-      if (!currentUser) return; // Доп. проверка
+      if (!currentUser) return;
       try {
           await deleteDoc(doc(db, "stories", storyId));
-          setStories(prevStories => prevStories.filter(story => story.id !== storyId)); // Обновляем состояние локально
+          setStories(prevStories => prevStories.filter(story => story.id !== storyId));
           toast({
               title: "История удалена",
               description: "Ваша история была успешно удалена.",
@@ -95,16 +95,16 @@ export default function MyStoriesPage() {
   };
 
 
-  if (authLoading || (loadingStories && stories.length === 0)) { // Показываем загрузку дольше, если истории еще не пришли
+  if (authLoading || (loadingStories && stories.length === 0)) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-f0f8ff" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }}>
+      <div className="flex justify-center items-center min-h-screen bg-f0f8ff">
         <Loader2 className="h-16 w-16 animate-spin text-a020f0" />
       </div>
     );
   }
 
   return (
-     <div className="min-h-screen bg-f0f8ff py-8 px-4" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }}>
+     <div className="min-h-screen bg-f0f8ff py-8 px-4">
       <div className="container mx-auto">
           <Button variant="ghost" onClick={() => router.push('/')} className="mb-6 text-a020f0 hover:bg-purple-100">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -120,7 +120,6 @@ export default function MyStoriesPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {stories.map((story) => (
-              // Обернули Card в Link
               <Link href={`/my-stories/${story.id}`} key={story.id} className="block group">
                 <Card className="flex flex-col h-full bg-card/90 backdrop-blur-sm border border-border/30 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer relative overflow-hidden">
                   <CardHeader className="pb-3">
@@ -132,26 +131,34 @@ export default function MyStoriesPage() {
                     </p>
                   </CardHeader>
                   <CardContent className="flex-grow mb-2">
-                     {/* Уменьшил line-clamp для компактности */}
                     <p className="text-sm line-clamp-4">{story.storyText}</p>
                   </CardContent>
                   <div className="border-t p-3 text-xs text-muted-foreground flex justify-between items-center">
                      <span>Сохранено: {story.createdAt}</span>
-                      {/* Кнопка удаления */}
+                      {/* Обертка для кнопки удаления */}
                       <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                              {/* Останавливаем всплытие события, чтобы клик не перешел на Link */}
-                              <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 z-10"
-                                  onClick={(e) => e.stopPropagation()} // Важно!
-                              >
-                                  <Trash2 className="h-4 w-4" />
-                                  <span className="sr-only">Удалить историю</span>
-                              </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent onClick={(e) => e.stopPropagation()}> {/* Останавливаем всплытие и здесь */}
+                          {/* Обертка span/div для перехвата клика ДО Link */}
+                          <span
+                            onClick={(e) => {
+                                e.preventDefault(); // Предотвращаем действие по умолчанию (переход по ссылке)
+                                e.stopPropagation(); // Останавливаем всплытие события к Link
+                            }}
+                            className="inline-block align-middle" // Добавляем стили, чтобы обертка не ломала верстку
+                          >
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 z-10"
+                                    // Убрали onClick отсюда
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Удалить историю</span>
+                                </Button>
+                            </AlertDialogTrigger>
+                          </span>
+                          {/* Контент диалога */}
+                          <AlertDialogContent onClick={(e) => e.stopPropagation()}> {/* Все еще останавливаем всплытие здесь */}
                               <AlertDialogHeader>
                                   <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
                                   <AlertDialogDescription>

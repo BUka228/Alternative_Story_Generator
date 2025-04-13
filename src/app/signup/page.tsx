@@ -1,4 +1,4 @@
-// src/app/signup/page.tsx
+
 'use client';
 
 import React, { useState } from 'react';
@@ -91,7 +91,8 @@ export default function SignUpPage() {
   // --- Конец нового обработчика ---
 
   return (
-     <div className="flex items-center justify-center min-h-screen bg-f0f8ff p-4" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }}>
+     // Убран стиль с фоновым изображением
+     <div className="flex items-center justify-center min-h-screen bg-f0f8ff p-4">
       <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border border-border/30 shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center text-a020f0">Регистрация</CardTitle>

@@ -1,4 +1,4 @@
-// src/app/page.tsx
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -114,7 +114,7 @@ export default function Home() {
         question3Answer,
         question4Answer,
         question5Answer,
-        // Добавьте question6Answer, если используете 6 вопросов
+     
         keyword1,
         keyword2,
         yearsTogether: Number(yearsTogether) || 1, // Убедимся, что это число
@@ -130,6 +130,12 @@ export default function Home() {
     }
   };
 
+  // Определяем, какие вопросы показывать (теперь включает 6)
+  const selectedQuestions = [
+    ...questions.firstImpression,
+    ...questions.awkwardMoments,
+  ];
+
   const generateRandomAnswers = () => {
     // Используем только ключи вопросов, которые реально отображаются
     const displayedQuestionIds = selectedQuestions.map(q => q.id);
@@ -139,7 +145,7 @@ export default function Home() {
         question3: setQuestion3Answer,
         question4: setQuestion4Answer,
         question5: setQuestion5Answer,
-        question6: setQuestion6Answer,
+        question6: setQuestion6Answer, // Добавили сеттер для 6 вопроса
     };
 
     displayedQuestionIds.forEach(qId => {
@@ -209,7 +215,7 @@ export default function Home() {
       genre,
       storyText: alternativeStory,
       // Сохраняем ответы и ключевые слова, если нужно
-      answers: { question1Answer, question2Answer, question3Answer, question4Answer, question5Answer, question6Answer },
+      answers: { question1Answer, question2Answer, question3Answer, question4Answer, question5Answer, question6Answer }, // Добавили q6
       keywords: { keyword1, keyword2 },
       createdAt: serverTimestamp() // Используем серверное время
     };
@@ -240,6 +246,7 @@ export default function Home() {
   // --- Отображение загрузки ---
   if (authLoading) {
     return (
+      // Убран стиль с фоновым изображением
       <div className="flex justify-center items-center min-h-screen bg-f0f8ff">
         <Loader2 className="h-16 w-16 animate-spin text-a020f0" />
       </div>
@@ -247,21 +254,10 @@ export default function Home() {
   }
   // --- Конец отображения загрузки ---
 
-  // Определяем, какие вопросы показывать
-  const selectedQuestions = [
-    ...questions.firstImpression,
-    ...questions.awkwardMoments,
-  ];
-
   // --- Рендеринг компонента ---
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 bg-f0f8ff relative" style={{
-      backgroundImage: 'url("/bg.jpg")',
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed' // Делаем фон фиксированным
-    }}>
+    // Убран стиль с фоновым изображением
+    <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 bg-f0f8ff relative">
 
       {/* --- Меню пользователя (позиционировано абсолютно) --- */}
       <div className="absolute top-4 right-4 z-50">
@@ -533,4 +529,3 @@ export default function Home() {
   );
   // --- Конец Рендеринга ---
 }
-
