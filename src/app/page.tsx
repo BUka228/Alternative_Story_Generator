@@ -415,7 +415,7 @@ export default function Home() {
           <Separator />
 
           {/* --- Годы и Жанр --- */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:items-end">
               <div className="space-y-2">
                 <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
                    <Star className="mr-2 inline-block h-4 w-4 text-yellow-500" />
