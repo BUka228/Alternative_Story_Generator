@@ -1,93 +1,57 @@
+// src/app/page.tsx
 'use client';
 
-import {generateAlternativeStory} from '@/ai/flows/generate-alternative-story';
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {Separator} from '@/components/ui/separator';
-import {useState, useRef, useEffect} from 'react';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Copy, User, Star, Share2, Heart} from 'lucide-react';
-import {useToast} from "@/hooks/use-toast";
+import React, { useState, useRef, useEffect } from 'react';
+import { generateAlternativeStory } from '@/ai/flows/generate-alternative-story';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Copy, User, Star, Share2, Heart, LogIn, LogOut, UserPlus, History, Settings, Loader2,
+    BookOpen, Clapperboard, Dumbbell, Gem, Ghost, Microscope, Tent, Tv // Gem, Tv - не использовались, но оставим
+} from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { BookOpen, Clapperboard, Dumbbell, Gem, Ghost, Microscope, Tent, Tv } from 'lucide-react';
-import {auth} from "@/firebase/firebaseConfig";
-import {signOut} from "firebase/auth";
+} from "@/components/ui/dropdown-menu";
+import { auth, db } from "@/firebase/firebaseConfig"; // Импортируем auth и db
+import { signOut } from "firebase/auth";
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Для сохранения
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext'; // <-- Импортируем хук useAuth
+import Link from 'next/link'; // Для ссылок на страницы входа/регистрации
 
+// --- Константы вопросов и ответов ---
 const questions = {
   firstImpression: [
-    {
-      id: 'question1',
-      text: 'Где вы впервые НЕ встретились?',
-    },
-    {
-      id: 'question2',
-      text: 'Какое кодовое слово чуть НЕ стало началом вашей дружбы?',
-    },
-    {
-      id: 'question3',
-      text: 'Что вы точно НЕ надели бы на первое свидание?',
-    },
+    { id: 'question1', text: 'Где вы впервые НЕ встретились?' },
+    { id: 'question2', text: 'Какое кодовое слово чуть НЕ стало началом вашей дружбы?' },
+    { id: 'question3', text: 'Что вы точно НЕ надели бы на первое свидание?' },
   ],
   awkwardMoments: [
-    {
-      id: 'question4',
-      text: 'Что самое абсурдное вы точно НЕ делали вместе?',
-    },
-    {
-      id: 'question5',
-      text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?',
-    },
-    {
-      id: 'question6',
-      text: 'Что ни в коем случае НЕ было забыто в важный момент?',
-    },
+    { id: 'question4', text: 'Что самое абсурдное вы точно НЕ делали вместе?' },
+    { id: 'question5', text: 'Какое животное ни в коем случае НЕ стало вашим питомцем?' },
+    { id: 'question6', text: 'Что ни в коем случае НЕ было забыто в важный момент?' },
   ],
-  hiddenTalents: [
-    {
-      id: 'question7',
-      text: 'Какое супер-умение НЕ пригодилось вам в первый год?',
-    },
-    {
-      id: 'question8',
-      text: 'Какое умение вы точно НЕ использовали, чтобы впечатлить друг друга?',
-    },
-     {
-      id: 'question9',
-      text: 'Какой талант точно НЕ помог вам избежать катастрофы?',
-    },
-  ],
-  randomEvents: [
-    {
-      id: 'question10',
-      text: 'Что вы точно НЕ делали вместе на первом свидании?',
-    },
-    {
-      id: 'question11',
-      text: 'Какое странное хобби точно НЕ стало вашим общим?',
-    },
-  ]
+  // Убрал неиспользуемые категории для краткости, можно вернуть при необходимости
 };
 
 const crazyAnswers = {
   question1: ['На вершине Эвереста во время чаепития', 'Внутри гигантского пончика', 'Во время телепортации в разные вселенные'],
   question2: ['Фиолетовый нарвал шепчет', 'Банановая сингулярность', 'Электромагнитный импульс любви'],
   question3: ['Костюм банана', 'Платье из воздушных шаров', 'Шлем из фольги'],
-  question4: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
-  question5: ['Динозавр', 'Феникс', 'Гигантский муравей'],
-  question6: ['Зонтик в солнечный день', 'Запасной скафандр', 'Инструкция по выживанию в зомби-апокалипсисе'],
-  question7: ['Левитация тостеров', 'Чтение мыслей камней', 'Мгновенная телепортация носков'],
-  question8: ['Поедание стекла', 'Разговор с дельфинами', 'Создание порталов в другие измерения'],
-   question9: ['Управление погодой', 'Телепортация', 'Предвидение будущего'],
-  question10: ['Прыгали с парашютом', 'Играли в шахматы под водой', 'Участвовали в гонках на тракторах'],
-  question11: ['Коллекционирование пуговиц', 'Выращивание светящихся грибов', 'Строительство замков из песка в космосе'],
+  question4: ['Прыгали с парашютом с дирижабля', 'Играли в шахматы под водой с акулами', 'Участвовали в гонках на тракторах по Луне'],
+  question5: ['Ручной динозавр', 'Огненный феникс', 'Гигантский говорящий муравей'],
+  question6: ['Зонтик во время солнечного затмения', 'Запасной скафандр на пляже', 'Инструкция по выживанию в зомби-апокалипсисе на свадьбе'],
+  // ... (можно добавить ответы для questions 7-11, если вернуть эти вопросы)
 };
 
 const genreIcons = {
@@ -97,11 +61,13 @@ const genreIcons = {
     "Как в кино": Clapperboard,
     "Научная фантастика": Microscope,
     "Сказка": BookOpen,
-    "Детектив": User,
+    "Детектив": User, // Можно заменить на Search или другую иконку
     "Хоррор (юмористический)": Ghost,
 };
+// --- Конец констант ---
 
 export default function Home() {
+  // --- Состояния компонента ---
   const [partner1Name, setPartner1Name] = useState('');
   const [partner2Name, setPartner2Name] = useState('');
   const [question1Answer, setQuestion1Answer] = useState('');
@@ -114,23 +80,31 @@ export default function Home() {
   const [keyword2, setKeyword2] = useState('');
   const [yearsTogether, setYearsTogether] = useState<number>(1);
   const [alternativeStory, setAlternativeStory] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false); // Переименовал isLoading для ясности
+  const [isSaving, setIsSaving] = useState(false); // Состояние для сохранения
   const [genre, setGenre] = useState('Смешная');
-  const {toast} = useToast();
+  // --- Конец состояний ---
+
+  // --- Хуки ---
+  const { currentUser, loading: authLoading } = useAuth(); // Получаем пользователя и статус загрузки Auth
+  const { toast } = useToast();
   const storyRef = useRef<HTMLParagraphElement>(null);
   const router = useRouter();
+  // --- Конец хуков ---
 
+  // --- Эффекты ---
   useEffect(() => {
+    // Плавный скролл к сгенерированной истории
     if (alternativeStory && storyRef.current) {
-      storyRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      storyRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [alternativeStory]);
+  // --- Конец эффектов ---
 
+  // --- Функции-обработчики ---
   const handleSubmit = async () => {
-    setIsLoading(true);
+    setIsGenerating(true);
+    setAlternativeStory(''); // Сбрасываем предыдущую историю
     try {
       const result = await generateAlternativeStory({
         partner1Name,
@@ -140,356 +114,423 @@ export default function Home() {
         question3Answer,
         question4Answer,
         question5Answer,
-        question6Answer,
+        // Добавьте question6Answer, если используете 6 вопросов
         keyword1,
         keyword2,
-        yearsTogether,
+        yearsTogether: Number(yearsTogether) || 1, // Убедимся, что это число
         genre,
       });
       setAlternativeStory(result.alternativeStory);
     } catch (error) {
       console.error('Failed to generate story:', error);
-      setAlternativeStory('Произошла ошибка при генерации истории.');
+      toast({ title: "Ошибка генерации", description: "Не удалось создать историю. Попробуйте еще раз.", variant: "destructive" });
+      setAlternativeStory(''); // Очищаем в случае ошибки
     } finally {
-      setIsLoading(false);
+      setIsGenerating(false);
     }
   };
 
   const generateRandomAnswers = () => {
-    const answers = Object.values(crazyAnswers);
-    setQuestion1Answer(answers[0][Math.floor(Math.random() * answers[0].length)]);
-    setQuestion2Answer(answers[1][Math.floor(Math.random() * answers[1].length)]);
-    setQuestion3Answer(answers[2][Math.floor(Math.random() * answers[2].length)]);
-    setQuestion4Answer(answers[3][Math.floor(Math.random() * answers[3].length)]);
-    setQuestion5Answer(answers[4][Math.floor(Math.random() * answers[4].length)]);
-     setQuestion6Answer(answers[5][Math.floor(Math.random() * answers[5].length)]);
+    // Используем только ключи вопросов, которые реально отображаются
+    const displayedQuestionIds = selectedQuestions.map(q => q.id);
+    const setters: Record<string, React.Dispatch<React.SetStateAction<string>>> = {
+        question1: setQuestion1Answer,
+        question2: setQuestion2Answer,
+        question3: setQuestion3Answer,
+        question4: setQuestion4Answer,
+        question5: setQuestion5Answer,
+        question6: setQuestion6Answer,
+    };
+
+    displayedQuestionIds.forEach(qId => {
+        if (crazyAnswers[qId as keyof typeof crazyAnswers] && setters[qId]) {
+            const possibleAnswers = crazyAnswers[qId as keyof typeof crazyAnswers];
+            setters[qId](possibleAnswers[Math.floor(Math.random() * possibleAnswers.length)]);
+        }
+    });
+
+    // Можно также рандомизировать имена, годы, жанр и ключевые слова для полного веселья
+    // setPartner1Name(...)
+    // setYearsTogether(...)
+    // setGenre(...)
   };
 
   const copyToClipboard = () => {
+    if (!alternativeStory) return;
     navigator.clipboard.writeText(alternativeStory).then(() => {
-      toast({
-        title: "История скопирована!",
-        description: "Теперь вы можете поделиться ею где угодно.",
-      });
+      toast({ title: "История скопирована!", description: "Теперь вы можете поделиться ею где угодно." });
     }).catch(err => {
-      toast({
-        title: "Ошибка копирования",
-        description: "Не удалось скопировать историю. Попробуйте еще раз.",
-        variant: "destructive",
-      });
+      toast({ title: "Ошибка копирования", description: "Не удалось скопировать историю.", variant: "destructive" });
       console.error("Failed to copy text: ", err);
     });
   };
 
-
   const shareStory = async () => {
+    if (!alternativeStory) return;
     const shareData = {
       title: 'История Наоборот',
-      text: `История Наоборот:\n\n${alternativeStory}\n\nПопробуйте создать свою историю: ${window.location.href}`,
-      url: window.location.href, // Current page URL
+      text: `Посмотрите, какая альтернативная история знакомства у нас получилась с ${partner1Name || 'партнером 1'} и ${partner2Name || 'партнером 2'}! \n\n"${alternativeStory}"\n\nСоздайте свою смешную историю здесь: ${window.location.href}`,
+      url: window.location.href,
     };
 
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-        toast({
-          title: "Отправлено!",
-          description: "История отправлена!",
-        });
-        console.log('Shared successfully');
+        // Уведомление не нужно, т.к. ОС покажет свое
       } catch (error) {
-        console.error('Sharing failed:', error);
+         // Ошибку 'AbortError' можно игнорировать (пользователь закрыл окно)
+        if (error instanceof Error && error.name !== 'AbortError') {
+            console.error('Sharing failed:', error);
+             toast({ title: "Ошибка", description: "Не удалось поделиться.", variant: "destructive" });
+        }
       }
     } else {
-      copyToClipboard();
+      copyToClipboard(); // Фоллбэк для браузеров без navigator.share
+      toast({ title: "Скопировано!", description: "Ссылка и история скопированы. Поделитесь ими вручную!" });
     }
   };
 
- const selectedQuestions = [
+  const handleSaveStory = async () => {
+    if (!currentUser) {
+      toast({ title: "Требуется вход", description: "Пожалуйста, войдите или зарегистрируйтесь, чтобы сохранить историю.", variant: "destructive" });
+      return;
+    }
+    if (!alternativeStory) {
+      toast({ title: "Нет истории", description: "Сначала сгенерируйте историю.", variant: "destructive" });
+      return;
+    }
+
+    setIsSaving(true);
+    const storyData = {
+      userId: currentUser.uid,
+      partner1Name,
+      partner2Name,
+      yearsTogether: Number(yearsTogether) || 1,
+      genre,
+      storyText: alternativeStory,
+      // Сохраняем ответы и ключевые слова, если нужно
+      answers: { question1Answer, question2Answer, question3Answer, question4Answer, question5Answer, question6Answer },
+      keywords: { keyword1, keyword2 },
+      createdAt: serverTimestamp() // Используем серверное время
+    };
+
+    try {
+      await addDoc(collection(db, 'stories'), storyData);
+      toast({ title: "Успех!", description: "История сохранена в вашем профиле.", duration: 3000 });
+    } catch (error) {
+      console.error("Ошибка при сохранении истории: ", error);
+      toast({ title: "Ошибка", description: "Не удалось сохранить историю.", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: "Вы вышли из системы." });
+      // Можно добавить router.push('/') если нужно перенаправление
+    } catch (error) {
+      console.error("Ошибка выхода:", error);
+      toast({ title: "Ошибка", description: "Не удалось выйти.", variant: "destructive" });
+    }
+  };
+  // --- Конец функций ---
+
+  // --- Отображение загрузки ---
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-f0f8ff">
+        <Loader2 className="h-16 w-16 animate-spin text-a020f0" />
+      </div>
+    );
+  }
+  // --- Конец отображения загрузки ---
+
+  // Определяем, какие вопросы показывать
+  const selectedQuestions = [
     ...questions.firstImpression,
     ...questions.awkwardMoments,
   ];
 
+  // --- Рендеринг компонента ---
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-f0f8ff" style={{
-        backgroundImage: 'url("/bg.jpg")',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center'
-      }}>
-      <div className="absolute top-4 right-4">
+    <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 bg-f0f8ff relative" style={{
+      backgroundImage: 'url("/bg.jpg")',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed' // Делаем фон фиксированным
+    }}>
+
+      {/* --- Меню пользователя (позиционировано абсолютно) --- */}
+      <div className="absolute top-4 right-4 z-50">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
-              <User className="h-4 w-4" />
-              <span className="sr-only">Open user menu</span>
+            <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm hover:bg-accent/90 border-border/50 shadow-md">
+              <User className="h-5 w-5" />
+              <span className="sr-only">Открыть меню пользователя</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem >
-              Профиль
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={async () => {
-              await signOut(auth);
-              router.push('/');
-            }}>
-              Выйти
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-56">
+            {currentUser ? (
+              <>
+                <DropdownMenuLabel className='truncate px-2 py-1.5 text-sm font-semibold'>
+                  {currentUser.email || 'Мой аккаунт'}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/my-stories')}>
+                  <History className="mr-2 h-4 w-4" />
+                  <span>Мои истории</span>
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem disabled>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Настройки</span>
+                </DropdownMenuItem> */}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Выйти</span>
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <>
+                 <DropdownMenuItem onClick={() => router.push('/signin')}>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  <span>Войти</span>
+                </DropdownMenuItem>
+                 <DropdownMenuItem onClick={() => router.push('/signup')}>
+                   <UserPlus className="mr-2 h-4 w-4" />
+                  <span>Регистрация</span>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <Card className="w-full max-w-5xl space-y-4 p-4 rounded-xl shadow-lg">
-        <CardHeader>
-          <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
+      {/* --- Конец меню пользователя --- */}
+
+      {/* Основная карточка */}
+      <Card className="w-full max-w-5xl space-y-4 p-6 md:p-8 rounded-xl shadow-lg bg-card/90 backdrop-blur-sm border border-border/30">
+        <CardHeader className="p-0 mb-4">
+          <CardTitle className="title text-2xl md:text-3xl font-semibold text-center text-a020f0">
+            История Наоборот
+          </CardTitle>
           <CardDescription className="text-sm text-muted-foreground text-center">
-            Ответьте на вопросы, чтобы создать забавную альтернативную историю вашей встречи.
+            Ответьте на НЕ-вопросы и получите забавную альтернативную историю вашей встречи!
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Separator className="my-4" />
 
+        <CardContent className="p-0 space-y-6">
+          {/* --- Имена партнеров --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="partner1Name" className="text-sm font-medium flex items-center">
-                <User className="mr-2 h-4 w-4" />
+                <User className="mr-2 h-4 w-4 text-muted-foreground" />
                 Имя первого партнера
               </Label>
               <Input
-                id="partner1Name"
-                type="text"
-                placeholder="Имя"
-                value={partner1Name}
-                onChange={(e) => setPartner1Name(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                id="partner1Name" type="text" placeholder="Например, Бэлла"
+                value={partner1Name} onChange={(e) => setPartner1Name(e.target.value)}
+                className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="partner2Name" className="text-sm font-medium flex items-center">
-                <User className="mr-2 h-4 w-4" />
+                <User className="mr-2 h-4 w-4 text-muted-foreground" />
                 Имя второго партнера
               </Label>
               <Input
-                id="partner2Name"
-                type="text"
-                placeholder="Имя"
-                value={partner2Name}
-                onChange={(e) => setPartner2Name(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                id="partner2Name" type="text" placeholder="Например, Эдвард"
+                value={partner2Name} onChange={(e) => setPartner2Name(e.target.value)}
+                className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
               />
             </div>
           </div>
+          {/* --- Конец имен партнеров --- */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {selectedQuestions.map((question, index) => (
+          <Separator />
+
+          {/* --- Блок вопросов --- */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
+              {selectedQuestions.map((question) => (
                 <div key={question.id} className="space-y-2">
                   <Label htmlFor={question.id} className="text-sm font-medium">
                     {question.text}
                   </Label>
                   <Input
-                    id={question.id}
-                    type="text"
-                    placeholder={crazyAnswers[question.id] ? crazyAnswers[question.id][0] : 'Ваш ответ'}
+                    id={question.id} type="text"
+                    placeholder={crazyAnswers[question.id as keyof typeof crazyAnswers] ? crazyAnswers[question.id as keyof typeof crazyAnswers][0] : 'Ваш абсурдный ответ'}
                     value={
                       question.id === 'question1' ? question1Answer :
                       question.id === 'question2' ? question2Answer :
                       question.id === 'question3' ? question3Answer :
                       question.id === 'question4' ? question4Answer :
                       question.id === 'question5' ? question5Answer :
-                       question.id === 'question6' ? question6Answer : ''
+                      question.id === 'question6' ? question6Answer : '' // Привязываем состояние
                     }
-                    onChange={(e) => {
-                      if (question.id === 'question1') setQuestion1Answer(e.target.value);
-                      else if (question.id === 'question2') setQuestion2Answer(e.target.value);
-                      else if (question.id === 'question3') setQuestion3Answer(e.target.value);
-                      else if (question.id === 'question4') setQuestion4Answer(e.target.value);
-                      else if (question.id === 'question5') setQuestion5Answer(e.target.value);
-                      else if (question.id === 'question6') setQuestion6Answer(e.target.value);
+                    onChange={(e) => { // Обновляем соответствующее состояние
+                      const value = e.target.value;
+                      if (question.id === 'question1') setQuestion1Answer(value);
+                      else if (question.id === 'question2') setQuestion2Answer(value);
+                      else if (question.id === 'question3') setQuestion3Answer(value);
+                      else if (question.id === 'question4') setQuestion4Answer(value);
+                      else if (question.id === 'question5') setQuestion5Answer(value);
+                      else if (question.id === 'question6') setQuestion6Answer(value);
                     }}
-                    className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                    className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
                   />
                 </div>
               ))}
           </div>
+          {/* --- Конец блока вопросов --- */}
 
+          <Separator />
+
+           {/* --- Ключевые слова --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="keyword1" className="text-sm font-medium">
-                  Ключевое слово 1
+                  Ключевое слово 1 (необязательно)
                 </Label>
                 <Input
-                  id="keyword1"
-                  type="text"
-                  placeholder="Секретное прозвище"
-                  value={keyword1}
-                  onChange={(e) => setKeyword1(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                  id="keyword1" type="text" placeholder="Секретное прозвище, любимая еда..."
+                  value={keyword1} onChange={(e) => setKeyword1(e.target.value)}
+                  className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="keyword2" className="text-sm font-medium">
-                  Ключевое слово 2
+                   Ключевое слово 2 (необязательно)
                 </Label>
                 <Input
-                  id="keyword2"
-                  type="text"
-                  placeholder="Памятное место"
-                  value={keyword2}
-                  onChange={(e) => setKeyword2(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                  id="keyword2" type="text" placeholder="Памятное место, общий мем..."
+                  value={keyword2} onChange={(e) => setKeyword2(e.target.value)}
+                  className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
                 />
               </div>
           </div>
+          {/* --- Конец Ключевых слов --- */}
 
+          <Separator />
+
+          {/* --- Годы и Жанр --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="yearsTogether" className="text-sm font-medium flex items-center">
-                   <Star className="mr-2 inline-block h-4 w-4" />
+                   <Star className="mr-2 inline-block h-4 w-4 text-yellow-500" />
                   Сколько лет вы вместе?
                 </Label>
                 <Input
-                  id="yearsTogether"
-                  type="number"
-                  min="1"
-                  placeholder="Количество лет"
-                  value={yearsTogether.toString()}
-                  onChange={(e) => setYearsTogether(Number(e.target.value))}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0"
+                  id="yearsTogether" type="number" min="0" placeholder="Например, 5"
+                  value={yearsTogether.toString()} onChange={(e) => setYearsTogether(Number(e.target.value) >= 0 ? Number(e.target.value) : 0)}
+                  className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0"
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="genre" className="text-sm font-medium">
-                  Выберите тон истории
+                  Выберите тон / жанр истории
                 </Label>
                 <Select value={genre} onValueChange={setGenre}>
-                  <SelectTrigger className="rounded-md border-gray-300 shadow-sm focus:border-a020f0 focus:ring-a020f0">
+                  <SelectTrigger className="rounded-md shadow-sm focus:border-a020f0 focus:ring-a020f0">
                     <SelectValue placeholder="Выберите тон истории" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Смешная">
-                      <div className="flex items-center">
-                        <Dumbbell className="mr-2 h-4 w-4"/>
-                        Смешная
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Фантастическая">
-                       <div className="flex items-center">
-                        <Tent className="mr-2 h-4 w-4"/>
-                        Фантастическая
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Романтическая (с иронией)">
-                       <div className="flex items-center">
-                        <Heart className="mr-2 h-4 w-4"/>
-                        Романтическая (с иронией)
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Как в кино">
-                       <div className="flex items-center">
-                        <Clapperboard className="mr-2 h-4 w-4"/>
-                        Как в кино
-                      </div>
-                    </SelectItem>
-                     <SelectItem value="Научная фантастика">
+                    {Object.entries(genreIcons).map(([genreName, Icon]) => (
+                      <SelectItem key={genreName} value={genreName}>
                         <div className="flex items-center">
-                          <Microscope className="mr-2 h-4 w-4"/>
-                          Научная фантастика
+                           <Icon className="mr-2 h-4 w-4" />
+                           {genreName}
                         </div>
-                    </SelectItem>
-                    <SelectItem value="Сказка">
-                       <div className="flex items-center">
-                        <BookOpen className="mr-2 h-4 w-4"/>
-                        Сказка
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Детектив">
-                       <div className="flex items-center">
-                        <User className="mr-2 h-4 w-4"/>
-                        Детектив
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Хоррор (юмористический)">
-                       <div className="flex items-center">
-                        <Ghost className="mr-2 h-4 w-4"/>
-                        Хоррор (юмористический)
-                      </div>
-                    </SelectItem>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
           </div>
+          {/* --- Конец Годы и Жанр --- */}
 
-          <div className="flex flex-col md:flex-row space-y-2 md:space-x-2 md:space-y-0">
+          <Separator />
+
+          {/* --- Кнопки действий --- */}
+          <div className="flex flex-col md:flex-row gap-3">
             <Button
               onClick={handleSubmit}
-              disabled={isLoading}
-              className="w-full md:w-auto bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              disabled={isGenerating || !partner1Name || !partner2Name} // Блокируем, если нет имен
+              className="flex-1 bg-a020f0 text-white rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 py-3 text-base"
             >
-              {isLoading ? (
+              {isGenerating ? (
                 <>
-                  Генерация истории...
-                   <div className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-dashed border-white"></div>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Генерация...
                 </>
               ) : (
-                'Создать историю'
+                'Создать историю!'
               )}
             </Button>
-
             <Button
               type="button"
               onClick={generateRandomAnswers}
-              className="w-full md:w-auto rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+              variant="outline"
+              className="flex-1 rounded-md shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500 py-3 text-base"
             >
-              Удиви меня!
+              Удиви меня! (Случайные ответы)
             </Button>
           </div>
+          {/* --- Конец Кнопок действий --- */}
 
+          {/* --- Блок с результатом --- */}
           {alternativeStory && (
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="alternativeStory" className="text-sm font-medium text-a020f0">
-                Альтернативная история:
+            <div className="space-y-4 mt-6 p-4 border rounded-lg bg-background/80 backdrop-blur-sm">
+              <Label htmlFor="alternativeStory" className="text-base font-semibold text-a020f0">
+                Ваша альтернативная история:
               </Label>
-              <p className="story-text" ref={storyRef}>{alternativeStory}</p>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-x-2">
-                {navigator.share ? (
-                  <Button onClick={shareStory} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
+              <p className="story-text whitespace-pre-wrap" ref={storyRef}>{alternativeStory}</p> {/* Добавил whitespace-pre-wrap для сохранения переносов строки */}
+              <div className="flex flex-col sm:flex-row gap-2 flex-wrap justify-center">
+                {currentUser && (
+                   <Button onClick={handleSaveStory} disabled={isSaving} className="min-w-[160px] bg-green-600 hover:bg-green-700 text-white">
+                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Heart className="mr-2 h-4 w-4" />}
+                     Сохранить
+                   </Button>
+                )}
+                {typeof navigator.share !== 'undefined' ? (
+                  // Показываем кнопку нативного шеринга, если браузер поддерживает
+                  <Button onClick={shareStory} className="min-w-[160px]" variant="outline">
                     <Share2 className="mr-2 h-4 w-4" />
                     Поделиться
                   </Button>
-                ) : (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Поделиться
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuItem onClick={copyToClipboard}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        Скопировать текст
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                ) : ( /* Фоллбэк для браузеров без navigator.share */
+                    <Button onClick={copyToClipboard} className="min-w-[160px]" variant="outline">
+                      <Copy className="mr-2 h-4 w-4" />
+                      Скопировать
+                    </Button>
                 )}
-                <Button onClick={copyToClipboard} className="w-full rounded-md bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-secondary-500">
-                  <Copy className="mr-2 h-4 w-4" />
-                  Скопировать текст
-                </Button>
-                <Button asChild variant="outline">
-                  <a href="https://boosty.to/altigerg" target="_blank" rel="noopener noreferrer">
-                    <Heart className="mr-2 h-4 w-4"/>
-                    Поддержать автора
-                  </a>
-                </Button>
+                {!navigator.share && ( /* Показываем кнопку копирования отдельно, если нет share */
+                     <Button onClick={copyToClipboard} className="min-w-[160px]" variant="outline">
+                       <Copy className="mr-2 h-4 w-4" />
+                       Скопировать текст
+                     </Button>
+                )}
+                 <Button asChild variant="outline" className="min-w-[160px]">
+                   <a href="https://boosty.to/altigerg" target="_blank" rel="noopener noreferrer">
+                     <Heart className="mr-2 h-4 w-4 text-red-500"/>
+                     Поддержать автора
+                   </a>
+                 </Button>
               </div>
+               {!currentUser && (
+                   <p className="text-xs text-center text-muted-foreground mt-3">
+                       <Link href="/signin" className="underline hover:text-a020f0">Войдите</Link> или <Link href="/signup" className="underline hover:text-a020f0">зарегистрируйтесь</Link>, чтобы сохранять свои истории.
+                   </p>
+               )}
             </div>
           )}
+          {/* --- Конец Блока с результатом --- */}
+
         </CardContent>
       </Card>
     </div>
   );
+  // --- Конец Рендеринга ---
 }
 
