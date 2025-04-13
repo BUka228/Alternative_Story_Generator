@@ -17,6 +17,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { BookOpen, Clapperboard, Dumbbell, Gem, Ghost, Microscope, Tent, Tv } from 'lucide-react';
+import {auth} from "@/firebase/firebaseConfig";
+import {signOut} from "firebase/auth";
+import { useRouter } from 'next/navigation';
 
 const questions = {
   firstImpression: [
@@ -115,6 +118,7 @@ export default function Home() {
   const [genre, setGenre] = useState('Смешная');
   const {toast} = useToast();
   const storyRef = useRef<HTMLParagraphElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (alternativeStory && storyRef.current) {
@@ -213,6 +217,27 @@ export default function Home() {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center'
       }}>
+      <div className="absolute top-4 right-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+              <User className="h-4 w-4" />
+              <span className="sr-only">Open user menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem >
+              Профиль
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={async () => {
+              await signOut(auth);
+              router.push('/');
+            }}>
+              Выйти
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Card className="w-full max-w-5xl space-y-4 p-4 rounded-xl shadow-lg">
         <CardHeader>
           <CardTitle className="title text-lg font-semibold text-center text-a020f0">История Наоборот</CardTitle>
@@ -467,3 +492,4 @@ export default function Home() {
     </div>
   );
 }
+
