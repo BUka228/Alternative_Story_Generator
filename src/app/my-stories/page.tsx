@@ -1,117 +1,150 @@
-// src/app/my-stories/page.tsx
-'use client'; // Пока сделаем клиентским для простоты
+'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation'; // useParams для получения ID из URL
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase/firebaseConfig';
-import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { doc, getDoc, Timestamp } from 'firebase/firestore'; // doc и getDoc для получения одного документа
+import { Loader2, ArrowLeft, User, Calendar, Type, Star, Tag } from 'lucide-react'; // Иконки
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface Story {
-    id: string;
-    partner1Name: string;
-    partner2Name: string;
-    storyText: string;
-    createdAt: any; // Используйте any или более точный тип после преобразования
-    genre: string;
-    yearsTogether: number;
-     // Добавьте другие поля, если они есть
+interface StoryDetail extends Story { // Расширяем базовый тип, если нужно
+    // Дополнительные поля, если появятся
 }
 
-export default function MyStoriesPage() {
+interface Story { // Повторим интерфейс для ясности или вынесем в общий файл
+    id: string;
+    partner1Name?: string;
+    partner2Name?: string;
+    storyText: string;
+    createdAt: any;
+    genre?: string;
+    yearsTogether?: number;
+    userId: string; // Поле userId теперь обязательно для проверки прав
+    answers?: Record<string, string>; // Добавим ответы, если они сохраняются
+    keywords?: { keyword1?: string, keyword2?: string }; // Добавим ключевые слова
+}
+
+export default function StoryDetailPage() {
+  const { storyId } = useParams<{ storyId: string }>(); // Получаем ID из URL
   const { currentUser, loading: authLoading } = useAuth();
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loadingStories, setLoadingStories] = useState(true);
+  const [story, setStory] = useState<StoryDetail | null>(null);
+  const [loadingStory, setLoadingStory] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Если проверка аутентификации еще идет, ничего не делаем
-    if (authLoading) {
+    // Ждем загрузки статуса аутентификации
+    if (authLoading) return;
+
+    // Если пользователя нет, или ID истории отсутствует, редирект или обработка ошибки
+    if (!currentUser || !storyId) {
+      router.push('/signin'); // Или на главную, или на my-stories
       return;
     }
 
-    // Если пользователь не аутентифицирован, перенаправляем на вход
-    if (!currentUser) {
-      router.push('/signin');
-      return;
-    }
-
-    // Загружаем истории
-    const fetchStories = async () => {
-      setLoadingStories(true);
+    const fetchStory = async () => {
+      setLoadingStory(true);
       setError(null);
       try {
-        const storiesRef = collection(db, 'stories');
-        const q = query(storiesRef, where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const fetchedStories = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            // Преобразуем Timestamp в читаемую строку или оставляем как есть для дальнейшей обработки
-            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toLocaleString('ru-RU') : 'N/A',
-          } as Story; // Указываем тип
-        });
-        setStories(fetchedStories);
+        const storyRef = doc(db, "stories", storyId); // Создаем ссылку на конкретный документ
+        const docSnap = await getDoc(storyRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // --- Проверка прав доступа ---
+          if (data.userId !== currentUser.uid) {
+             setError("У вас нет доступа к этой истории.");
+             setStory(null);
+          } else {
+              setStory({
+                id: docSnap.id,
+                ...data,
+                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toLocaleString('ru-RU') : 'N/A',
+              } as StoryDetail);
+          }
+        } else {
+          setError("История не найдена.");
+          setStory(null);
+        }
       } catch (err) {
-        console.error("Error fetching stories:", err);
-        setError("Не удалось загрузить истории.");
+        console.error("Error fetching story:", err);
+        setError("Не удалось загрузить историю.");
+        setStory(null);
       } finally {
-        setLoadingStories(false);
+        setLoadingStory(false);
       }
     };
 
-    fetchStories();
-  }, [currentUser, authLoading, router]); // Зависимости эффекта
+    fetchStory();
+  }, [storyId, currentUser, authLoading, router]); // Зависимости эффекта
 
-  // Общее состояние загрузки
-  if (authLoading || loadingStories) {
+  if (authLoading || loadingStory) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen bg-f0f8ff" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }}>
         <Loader2 className="h-16 w-16 animate-spin text-a020f0" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Button variant="ghost" onClick={() => router.push('/')} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Назад к генератору
-      </Button>
-      <h1 className="text-3xl font-bold mb-6 text-center text-a020f0">Мои сохраненные истории</h1>
+     <div className="min-h-screen bg-f0f8ff py-8 px-4" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundAttachment: 'fixed' }}>
+      <div className="container mx-auto max-w-4xl"> {/* Ограничим ширину для удобства чтения */}
+        <Button variant="ghost" onClick={() => router.push('/my-stories')} className="mb-6 text-a020f0 hover:bg-purple-100">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Назад к списку историй
+        </Button>
 
-      {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+        {error && (
+            <Card className="mb-6 bg-destructive/10 border-destructive">
+                 <CardHeader>
+                    <CardTitle className="text-destructive">{error}</CardTitle>
+                 </CardHeader>
+            </Card>
+        )}
 
-      {stories.length === 0 && !error && (
-        <p className="text-center text-muted-foreground">У вас пока нет сохраненных историй.</p>
-      )}
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {stories.map((story) => (
-          <Card key={story.id} className="flex flex-col">
+        {story && !error && (
+          <Card className="bg-card/90 backdrop-blur-sm border border-border/30 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg">
+              <CardTitle className="text-2xl md:text-3xl font-semibold text-a020f0 title text-center mb-2">
                 История для {story.partner1Name || 'Партнер 1'} и {story.partner2Name || 'Партнер 2'}
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Жанр: {story.genre || 'Не указан'} | Лет вместе: {story.yearsTogether || '?'}
-              </p>
+              <CardDescription className="text-center text-muted-foreground flex flex-wrap justify-center items-center gap-x-4 gap-y-1">
+                 <span className="flex items-center"><Calendar className="mr-1.5 h-4 w-4" /> {story.createdAt}</span>
+                 {story.genre && <span className="flex items-center"><Type className="mr-1.5 h-4 w-4" /> {story.genre}</span>}
+                 {story.yearsTogether !== undefined && <span className="flex items-center"><Star className="mr-1.5 h-4 w-4 text-yellow-500" /> {story.yearsTogether} лет вместе</span>}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-sm line-clamp-6">{story.storyText}</p> {/* Ограничим высоту текста */}
+            <CardContent className="px-6 md:px-8 py-6">
+               {/* Отображение ключевых слов, если они есть */}
+                {(story.keywords?.keyword1 || story.keywords?.keyword2) && (
+                    <div className="mb-4 text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                        <Tag className="h-4 w-4 inline-block"/> Ключевые слова:
+                        {story.keywords.keyword1 && <span className="bg-secondary px-2 py-0.5 rounded">{story.keywords.keyword1}</span>}
+                        {story.keywords.keyword2 && <span className="bg-secondary px-2 py-0.5 rounded">{story.keywords.keyword2}</span>}
+                    </div>
+                )}
+
+              <p className="text-base md:text-lg leading-relaxed whitespace-pre-wrap">
+                {story.storyText}
+              </p>
+
+               {/* Можно добавить отображение ответов на вопросы, если нужно */}
+               {/*
+               {story.answers && (
+                   <div className="mt-6 border-t pt-4">
+                       <h4 className="font-semibold mb-2">Ответы на НЕ-вопросы:</h4>
+                       <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                           {Object.entries(story.answers).map(([key, value]) => value ? <li key={key}>{value}</li> : null)}
+                       </ul>
+                   </div>
+               )}
+               */}
             </CardContent>
-            <div className="border-t p-4 text-xs text-muted-foreground">
-               Сохранено: {story.createdAt}
-               {/* Можно добавить кнопку "Удалить" или "Поделиться" здесь */}
-            </div>
+             {/* Можно добавить футер с кнопками "Поделиться", "Удалить" здесь, если нужно */}
           </Card>
-        ))}
+        )}
       </div>
     </div>
   );
