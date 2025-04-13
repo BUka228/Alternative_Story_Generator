@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -11,6 +12,7 @@
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
+// Обновляем схему, добавляя question6Answer
 const GenerateAlternativeStoryInputSchema = z.object({
   partner1Name: z.string().describe('The name of the first partner.'),
   partner2Name: z.string().describe('The name of the second partner.'),
@@ -19,6 +21,7 @@ const GenerateAlternativeStoryInputSchema = z.object({
   question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
   question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
   question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
+  question6Answer: z.string().describe('Answer to the sixth multiple-choice question.'), // <-- Добавлено
   keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
   keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
   yearsTogether: z.number().describe('The number of years the couple has been together.'),
@@ -38,25 +41,13 @@ export async function generateAlternativeStory(input: GenerateAlternativeStoryIn
 const prompt = ai.definePrompt({
   name: 'generateAlternativeStoryPrompt',
   input: {
-    schema: z.object({
-      partner1Name: z.string().describe('The name of the first partner.'),
-      partner2Name: z.string().describe('The name of the second partner.'),
-      question1Answer: z.string().describe('Answer to the first multiple-choice question.'),
-      question2Answer: z.string().describe('Answer to the second multiple-choice question.'),
-      question3Answer: z.string().describe('Answer to the third multiple-choice question.'),
-      question4Answer: z.string().describe('Answer to the fourth multiple-choice question.'),
-      question5Answer: z.string().describe('Answer to the fifth multiple-choice question.'),
-      keyword1: z.string().optional().describe('Optional keyword or phrase for personalization.'),
-      keyword2: z.string().optional().describe('Optional second keyword or phrase for personalization.'),
-      yearsTogether: z.number().describe('The number of years the couple has been together.'),
-      genre: z.string().describe('The genre or tone of the story (e.g., Смешная, Фантастическая, Романтическая (с иронией), Как в кино, Научная фантастика, Сказка, Детектив, Хоррор (юмористический)).'),
-    }),
+    // Используем обновленную схему
+    schema: GenerateAlternativeStoryInputSchema,
   },
   output: {
-    schema: z.object({
-      alternativeStory: z.string().describe('A humorous, fictional alternative story of how the pair met.'),
-    }),
+    schema: GenerateAlternativeStoryOutputSchema,
   },
+  // Обновляем промпт, добавляя использование question6Answer
   prompt: `You are a creative writer specializing in humorous and fictional stories.
 
   Based on the provided answers to the multiple-choice questions, the number of years the couple has been together, and the selected genre, generate a short, funny, and completely made-up "alternative story" of how {{partner1Name}} and {{partner2Name}} met. Be creative and unexpected. Incorporate the number of years ({{{yearsTogether}}}) into the story in a funny way. The story should be in Russian. The story should be in the "{{{genre}}}" genre. Try to use the provided keyword(s) to make the story more unique and personal.
@@ -66,6 +57,7 @@ const prompt = ai.definePrompt({
   Question 3 Answer: {{{question3Answer}}}
   Question 4 Answer: {{{question4Answer}}}
   Question 5 Answer: {{{question5Answer}}}
+  Question 6 Answer: {{{question6Answer}}} // <-- Добавлено
   {{#if keyword1}}
   Keyword 1: {{{keyword1}}}
   {{/if}}

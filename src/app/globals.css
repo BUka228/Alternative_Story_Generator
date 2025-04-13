@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans); /* Используем основной шрифт по умолчанию */
 }
 
 @layer base {
@@ -43,8 +43,14 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --f0f8ff: 225 100% 97%;
-    --a020f0: 267 83% 34%;
+    --f0f8ff: 225 100% 97%; /* Light blue background */
+    --a020f0: 267 83% 34%; /* Purple accent */
+
+    /* Добавляем переменные для шрифтов жанров */
+    --font-skazka: var(--font-caveat);
+    --font-scifi: var(--font-orbitron);
+    --font-kino: var(--font-cinzel);
+    --font-default: var(--font-geist-sans); /* Шрифт по умолчанию для истории */
   }
 
   .dark {
@@ -105,20 +111,59 @@ body {
   background-color: hsl(var(--a020f0));
 }
 
-/* Apply a clean and readable sans-serif font */
-body {
-  font-family: var(--font-geist-sans);
-}
-
 /* Apply a clean and readable sans-serif font for titles */
 .title {
   font-family: var(--font-geist-mono);
 }
 
+/* Стили для текста истории */
 .story-text {
-  font-family: var(--font-geist-sans);
+  font-family: var(--font-default); /* Шрифт по умолчанию */
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 1rem;
   color: hsl(var(--foreground));
+  transition: font-family 0.3s ease; /* Плавный переход шрифта */
+}
+
+/* Применяем шрифты в зависимости от класса */
+.story-genre-skazka {
+  font-family: var(--font-skazka);
+  font-size: 1.2rem; /* Чуть крупнее для сказочного стиля */
+}
+
+.story-genre-nauchnaya-fantastika {
+  font-family: var(--font-scifi);
+}
+
+.story-genre-kak-v-kino {
+  font-family: var(--font-kino);
+  font-size: 1.15rem; /* Немного крупнее для кинематографичности */
+}
+
+/* Можно добавить стили для других жанров по аналогии */
+.story-genre-smeshnaya { /* Для смешной можно оставить по умолчанию или выбрать другой */
+  font-family: var(--font-default);
+}
+.story-genre-fantasticheskaya { /* Для Фантастической можно использовать Orbitron или другой */
+  font-family: var(--font-scifi); /* Пока используем SciFi */
+}
+.story-genre-romanticheskaya-\(s-ironiey\) { /* Романтика с иронией */
+  font-family: var(--font-default);
+}
+.story-genre-detektiv { /* Детектив */
+  font-family: var(--font-default);
+}
+.story-genre-horror-\(yumoristicheskiy\) { /* Хоррор */
+  font-family: var(--font-default);
+}
+
+/* Классы для анимаций (пример) */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
