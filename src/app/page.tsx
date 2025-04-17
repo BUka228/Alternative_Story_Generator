@@ -366,7 +366,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-screen py-6 px-2 relative overflow-x-hidden">
 
         {/* --- Меню пользователя (добавим анимацию) --- */}
-         <div className="absolute top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50">
              <DropdownMenu>
                  <DropdownMenuTrigger asChild>
                      <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm hover:bg-accent/90 border-border/50 shadow-md interactive-scale">
