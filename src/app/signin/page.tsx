@@ -148,7 +148,7 @@ export default function SignInPage() {
 
         </CardContent>
         <CardFooter className="text-center text-sm pt-4">
-          Нет аккаунта?{' '}
+          Нет аккаунта?{'  '}
           <Link href="/signup" className="underline text-a020f0 hover:text-purple-700">
             Зарегистрироваться
           </Link>

@@ -153,6 +153,61 @@ export default function Home() {
           }
       };
   }, []);
+
+  useEffect(() => {
+    // Запускаем только когда статус авторизации определен и пользователь авторизован
+    if (!authLoading && currentUser) {
+      try {
+        const savedDataString = sessionStorage.getItem('storyGenPending_data');
+        if (savedDataString) {
+          console.log("Found pending story data in sessionStorage, restoring..."); // Отладка
+          const savedData = JSON.parse(savedDataString);
+
+          // Восстанавливаем состояние
+          setPartner1Name(savedData.partner1Name || '');
+          setPartner2Name(savedData.partner2Name || '');
+          setPartner1PetName(savedData.partner1PetName || '');
+          setPartner2PetName(savedData.partner2PetName || '');
+          setQuestion1Answer(savedData.question1Answer || '');
+          setQuestion2Answer(savedData.question2Answer || '');
+          setQuestion3Answer(savedData.question3Answer || '');
+          setQuestion4Answer(savedData.question4Answer || '');
+          setQuestion5Answer(savedData.question5Answer || '');
+          setQuestion6Answer(savedData.question6Answer || '');
+          setQuestion7Answer(savedData.question7Answer || '');
+          setQuestion8Answer(savedData.question8Answer || '');
+          setKeyword1(savedData.keyword1 || '');
+          setKeyword2(savedData.keyword2 || '');
+          setKeyword3(savedData.keyword3 || '');
+          setYearsTogether(savedData.yearsTogether || 1);
+          setGenre(savedData.genre || 'Смешная');
+          setAlternativeStory(savedData.alternativeStory || '');
+
+          // Очищаем sessionStorage после успешного восстановления
+          clearPendingStoryData();
+
+          // Уведомление для пользователя
+          toast({ title: "История восстановлена!", description: "Данные вашей предыдущей сессии загружены." });
+
+           // Плавно прокручиваем к восстановленной истории
+           if (savedData.alternativeStory && storyTextRef.current) {
+              const timer = setTimeout(() => {
+                  if (storyTextRef.current) {
+                     storyTextRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }
+              }, 300); // Небольшая задержка для рендера
+              // Не забываем очищать таймер, если компонент размонтируется раньше
+              // return () => clearTimeout(timer); // В данном случае необязательно, т.к. выполняется один раз
+           }
+        }
+      } catch (e) {
+        console.error("Failed to restore pending story data from sessionStorage:", e);
+         clearPendingStoryData(); // Очищаем в случае ошибки парсинга JSON
+      }
+    }
+    // Если пользователь не авторизован, мы НЕ восстанавливаем данные,
+    // но и не очищаем sessionStorage здесь, чтобы данные сохранились до момента входа.
+  }, [currentUser, authLoading]); // Зависимости: статус пользователя и флаг загрузки auth
   // --- Конец эффектов ---
 
   // Определяем, какие вопросы показывать (теперь включает 8)
@@ -336,13 +391,41 @@ export default function Home() {
   };
 
   const handleSignOut = async () => {
-    // ... (код без изменений) ...
+    try {
+      await signOut(auth);
+      clearPendingStoryData(); // Очищаем данные при выходе
+      toast({ title: "Вы вышли из системы." });
+    } catch (error) {
+      console.error("Ошибка выхода:", error);
+      toast({ title: "Ошибка", description: "Не удалось выйти.", variant: "destructive" });
+    }
+};
+
+  const savePendingStoryData = () => {
+    if (!alternativeStory) return; // Сохраняем, только если есть история
+    const pendingData = {
+      partner1Name, partner2Name, partner1PetName, partner2PetName,
+      question1Answer, question2Answer, question3Answer, question4Answer,
+      question5Answer, question6Answer, question7Answer, question8Answer,
+      keyword1, keyword2, keyword3,
+      yearsTogether, genre, alternativeStory
+    };
+    try {
+      // Используем sessionStorage, так как данные нужны только на время сессии аутентификации
+      sessionStorage.setItem('storyGenPending_data', JSON.stringify(pendingData));
+      console.log("Pending story data saved to sessionStorage."); // Для отладки
+    } catch (e) {
+      console.error("Failed to save pending story data to sessionStorage:", e);
+      // Можно показать toast с ошибкой, если критично
+    }
+  };
+
+  const clearPendingStoryData = () => {
       try {
-        await signOut(auth);
-        toast({ title: "Вы вышли из системы." });
-      } catch (error) {
-        console.error("Ошибка выхода:", error);
-        toast({ title: "Ошибка", description: "Не удалось выйти.", variant: "destructive" });
+          sessionStorage.removeItem('storyGenPending_data');
+          console.log("Pending story data cleared from sessionStorage."); // Для отладки
+      } catch (e) {
+           console.error("Failed to clear pending story data from sessionStorage:", e);
       }
   };
   // --- Конец функций ---
@@ -667,7 +750,26 @@ export default function Home() {
                             </a>
                          </Button>
                       </div>
-                      {!currentUser && ( <p className="text-xs text-center text-muted-foreground mt-3"> <Link href="/signin" className="underline hover:text-a020f0">Войдите</Link> или <Link href="/signup" className="underline hover:text-a020f0">зарегистрируйтесь</Link>, чтобы сохранять свои истории. </p> )}
+                      {/* --- ИЗМЕНЕНИЕ Ссылок на Вход/Регистрацию с сохранением состояния --- */}
+                      {!currentUser && (
+                        <p className="text-xs text-center text-muted-foreground mt-3">
+                          <button
+                            onClick={() => { savePendingStoryData(); router.push('/signin'); }}
+                            className="underline hover:text-a020f0 focus:outline-none focus:ring-1 focus:ring-a020f0 rounded px-1" // Добавили стили для фокуса
+                          >
+                            Войдите
+                          </button>
+                          {' '}или{' '}
+                          <button
+                            onClick={() => { savePendingStoryData(); router.push('/signup'); }}
+                            className="underline hover:text-a020f0 focus:outline-none focus:ring-1 focus:ring-a020f0 rounded px-1" // Добавили стили для фокуса
+                          >
+                            зарегистрируйтесь
+                          </button>
+                          , чтобы сохранять свои истории.
+                        </p>
+                      )}
+                      {/* --- КОНЕЦ ИЗМЕНЕНИЯ --- */}
                     </motion.div>
                   )}
                 </AnimatePresence>
